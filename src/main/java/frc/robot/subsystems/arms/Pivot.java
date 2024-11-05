@@ -9,7 +9,6 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-
 import org.littletonrobotics.junction.Logger;
 
 public class Pivot extends SubsystemBase {
@@ -29,12 +28,7 @@ public class Pivot extends SubsystemBase {
   private TrapezoidProfile.State pivotGoalStateDegrees = new TrapezoidProfile.State();
   private TrapezoidProfile.State pivotCurrentStateDegrees = new TrapezoidProfile.State();
 
-  
-
   double goalDegrees;
-
-
-  
 
   private ArmFeedforward pivotFFModel;
 
@@ -64,8 +58,6 @@ public class Pivot extends SubsystemBase {
         break;
     }
 
-    
-
     maxVelocityDegPerSec = 150;
     maxAccelerationDegPerSecSquared = 226;
     // maxAccelerationDegPerSecSquared = 180;
@@ -76,7 +68,8 @@ public class Pivot extends SubsystemBase {
 
     // setPivotGoal(90);
     // setPivotCurrent(getPivotPositionDegs());
-    pivotCurrentStateDegrees = pivotProfile.calculate(0, pivotCurrentStateDegrees, pivotGoalStateDegrees);
+    pivotCurrentStateDegrees =
+        pivotProfile.calculate(0, pivotCurrentStateDegrees, pivotGoalStateDegrees);
 
     pivot.configurePID(kP, 0, 0);
     pivotFFModel = new ArmFeedforward(0, kG, kV, 0);
@@ -118,13 +111,13 @@ public class Pivot extends SubsystemBase {
     pivotCurrentStateDegrees = new TrapezoidProfile.State(currentDegrees, 0);
   }
 
- 
-
   @Override
   public void periodic() {
     pivot.updateInputs(pInputs);
 
-    pivotCurrentStateDegrees = pivotProfile.calculate(Constants.ROBOT_LOOP_PERIOD_SECS, pivotCurrentStateDegrees, pivotGoalStateDegrees);
+    pivotCurrentStateDegrees =
+        pivotProfile.calculate(
+            Constants.ROBOT_LOOP_PERIOD_SECS, pivotCurrentStateDegrees, pivotGoalStateDegrees);
 
     setPositionDegs(pivotCurrentStateDegrees.position, pivotCurrentStateDegrees.velocity);
 

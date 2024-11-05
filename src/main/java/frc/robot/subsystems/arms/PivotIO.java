@@ -1,5 +1,4 @@
-package frc.robot.subsystems.pivot;
-
+package frc.robot.subsystems.arms;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface PivotIO {

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.pivot;
+package frc.robot.subsystems.arms;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
@@ -41,8 +41,8 @@ public class PivotIOTalonFX implements PivotIO {
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
     leader = new TalonFX(leadID, Constants.CANBUS);
     follower = new TalonFX(followID, Constants.CANBUS);
-    //pigeon = new Pigeon2(gyroID, Constants.CANBUS);
-   // pigeon.reset();
+    // pigeon = new Pigeon2(gyroID, Constants.CANBUS);
+    // pigeon.reset();
 
     leader.getConfigurator().apply(config);
 

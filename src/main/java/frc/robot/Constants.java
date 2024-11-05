@@ -23,8 +23,8 @@ package frc.robot;
  */
 public final class Constants {
   public static final Mode currentMode = Mode.REAL;
-public static final double ROBOT_LOOP_PERIOD_SECS = 0;
-public static final double PIVOT_ZERO_ANGLE = 59;
+  public static final double ROBOT_LOOP_PERIOD_SECS = 0;
+  public static final double PIVOT_ZERO_ANGLE = 59;
 
   public static enum Mode {
     /** Running on a real robot. */

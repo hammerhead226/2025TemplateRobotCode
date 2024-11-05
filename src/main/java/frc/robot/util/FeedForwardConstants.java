@@ -1,5 +1,3 @@
 package frc.robot.util;
 
-public class FeedForwardConstants {
-    
-}
+public class FeedForwardConstants {}
