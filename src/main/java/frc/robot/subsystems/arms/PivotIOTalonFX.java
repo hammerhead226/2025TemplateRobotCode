@@ -41,10 +41,10 @@ public class PivotIOTalonFX implements PivotIO {
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
-    leader = new TalonFX(leadID, Constants.CANBUS);
-    follower = new TalonFX(followID, Constants.CANBUS);
-    // pigeon = new Pigeon2(gyroID, Constants.CANBUS);
-    // pigeon.reset();
+    leader = new TalonFX(leadID, physicalConstants.CANBUS);
+    follower = new TalonFX(followID, physicalConstants.CANBUS);
+    pigeon = new Pigeon2(gyroID, physicalConstants.CANBUS);
+    pigeon.reset();
 
     leader.getConfigurator().apply(config);
 
@@ -86,11 +86,12 @@ public class PivotIOTalonFX implements PivotIO {
     BaseStatusSignal.refreshAll(
         leaderPositionDegs, velocityDegsPerSec, appliedVolts, currentAmps, pitch);
     inputs.gyroConnected = BaseStatusSignal.refreshAll(pitch).equals(StatusCode.OK);
-    inputs.pitch = pitch.getValueAsDouble() + physicalConstants.PIVOT_ZERO_ANGLE;
+    inputs.pitch = pitch.getValueAsDouble() + physicalConstants.PivotConstants.PIVOT_ZERO_ANGLE;
     inputs.positionDegs =
         Conversions.falconToDegrees(
                 (leaderPositionDegs.getValueAsDouble()), physicalConstants.PivotConstants.REDUCTION)
-            + 59;
+            + physicalConstants.PivotConstants.PIVOT_ZERO_ANGLE;
+            
 
     // inputs.velocityDegsPerSec =
     //     Conversions.falconToDegrees(

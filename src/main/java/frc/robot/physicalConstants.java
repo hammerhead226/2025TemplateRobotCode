@@ -90,6 +90,8 @@ public final class physicalConstants {
     public static final double REDUCTION = (15.0 / 1.0) * (34.0 / 24.0) * (24.0 / 18.0) * (50.0 / 14.0);
     public static final double STOW_SETPOINT_DEG = 50.7;
     public static final double INTAKE_SETPOINT_DEG = 59.0;
+
+    public static final double PIVOT_ZERO_ANGLE = 59;
   }
   public static class LEDConstants{
     public static final double COLOR_BLUE = 0.87;
