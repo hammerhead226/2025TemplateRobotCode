@@ -9,7 +9,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import frc.robot.Constants;
+import frc.robot.physicalConstants;
 
 /** Add your docs here. */
 public class PivotIOSim implements PivotIO {
@@ -51,7 +51,7 @@ public class PivotIOSim implements PivotIO {
     inputs.velocityDegsPerSec = Math.toDegrees(velocityRadsPerSec);
     inputs.currentAmps = currentAmps;
 
-    sim.update(Constants.LOOP_PERIOD_SECS);
+    sim.update(physicalConstants.LOOP_PERIOD_SECS);
   }
 
   @Override
