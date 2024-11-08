@@ -127,14 +127,6 @@ public class Elevator extends SubsystemBase {
     return (Math.abs(eInputs.elevatorPosition - goal) <= physicalConstants.ElevatorConstants.THRESHOLD);
   }
 
-<<<<<<< Updated upstream
-  public boolean barAtGoal() {
-    return (Math.abs(aInputs.barPositionDegrees - barGoal.position)
-        <= physicalConstants.ElevatorConstants.BAR_THRESHOLD);
-  }
-
-=======
->>>>>>> Stashed changes
   public double getElevatorPosition() {
     return eInputs.elevatorPosition;
   }
@@ -147,40 +139,10 @@ public class Elevator extends SubsystemBase {
     return (Math.abs(getElevatorError()) <= physicalConstants.ElevatorConstants.THRESHOLD);
   }
 
-<<<<<<< Updated upstream
-  public boolean ampBarAtGoal() {
-
-    return (Math.abs(getbarErrorToGoal()) <= physicalConstants.ElevatorConstants.BAR_THRESHOLD);
-  }
-
-  public void setBarBrakeMode(boolean bool) {
-    ampBar.setBrakeMode(bool);
-  }
-
-  public double getBarPositionRotations() {
-    return aInputs.barPositionDegrees;
-  }
-
-  public void setBarPosition(double positionDegrees, double velocityDegsPerSec) {
-    Logger.recordOutput("bar PositionDegrees", positionDegrees);
-    ampBar.setPositionSetpoint(positionDegrees, 0);
-    }
-
-  public void stopAmpBar() {
-    ampBar.stop();
-  }
-
-  public void setBarGoal(double barGoalDegrees) {
-
-    barGoal = new TrapezoidProfile.State(barGoalDegrees, 0);
-    Logger.recordOutput("bar goal", barGoalDegrees);
-  }
-=======
   // public void setbarCurrent(double current) {
 
   //   barCurrent = new TrapezoidProfile.State(current, 0);
   // }
->>>>>>> Stashed changes
 
   public void setExtenderGoal(double setpoint) {
     goal = setpoint;

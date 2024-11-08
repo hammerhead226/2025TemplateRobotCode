@@ -10,12 +10,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-<<<<<<< Updated upstream
 import frc.robot.physicalConstants;
-=======
-import frc.robot.Constants;
-import org.littletonrobotics.junction.Logger;
->>>>>>> Stashed changes
 
 public class Pivot extends SubsystemBase {
   private final PivotIO pivot;
@@ -123,11 +118,7 @@ public class Pivot extends SubsystemBase {
 
     pivotCurrentStateDegrees =
         pivotProfile.calculate(
-<<<<<<< Updated upstream
           physicalConstants.LOOP_PERIOD_SECS, pivotCurrentStateDegrees, pivotGoalStateDegrees);
-=======
-            Constants.ROBOT_LOOP_PERIOD_SECS, pivotCurrentStateDegrees, pivotGoalStateDegrees);
->>>>>>> Stashed changes
 
     setPositionDegs(pivotCurrentStateDegrees.position, pivotCurrentStateDegrees.velocity);
 

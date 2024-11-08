@@ -1,5 +1,7 @@
 package frc.robot.subsystems.arms;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
@@ -12,11 +14,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.google.flatbuffers.Constants;
 
 import frc.robot.physicalConstants;
 import frc.robot.util.Conversions;
-import org.littletonrobotics.junction.Logger;
 
 public class PivotIOTalonFX implements PivotIO {
   private final TalonFX leader;
@@ -41,17 +41,10 @@ public class PivotIOTalonFX implements PivotIO {
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
-<<<<<<< Updated upstream
     leader = new TalonFX(leadID, physicalConstants.CANBUS);
     follower = new TalonFX(followID, physicalConstants.CANBUS);
     pigeon = new Pigeon2(gyroID, physicalConstants.CANBUS);
     pigeon.reset();
-=======
-    leader = new TalonFX(leadID, Constants.CANBUS);
-    follower = new TalonFX(followID, Constants.CANBUS);
-    // pigeon = new Pigeon2(gyroID, Constants.CANBUS);
-    // pigeon.reset();
->>>>>>> Stashed changes
 
     leader.getConfigurator().apply(config);
 

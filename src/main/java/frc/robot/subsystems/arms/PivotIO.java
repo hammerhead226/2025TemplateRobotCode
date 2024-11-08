@@ -1,8 +1,4 @@
 package frc.robot.subsystems.arms;
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 import org.littletonrobotics.junction.AutoLog;
 
 public interface PivotIO {
