@@ -41,10 +41,17 @@ public class PivotIOTalonFX implements PivotIO {
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+<<<<<<< Updated upstream
     leader = new TalonFX(leadID, physicalConstants.CANBUS);
     follower = new TalonFX(followID, physicalConstants.CANBUS);
     pigeon = new Pigeon2(gyroID, physicalConstants.CANBUS);
     pigeon.reset();
+=======
+    leader = new TalonFX(leadID, Constants.CANBUS);
+    follower = new TalonFX(followID, Constants.CANBUS);
+    // pigeon = new Pigeon2(gyroID, Constants.CANBUS);
+    // pigeon.reset();
+>>>>>>> Stashed changes
 
     leader.getConfigurator().apply(config);
 

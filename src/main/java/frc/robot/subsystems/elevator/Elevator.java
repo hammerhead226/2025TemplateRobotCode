@@ -1,6 +1,5 @@
 package frc.robot.subsystems.elevator;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -14,10 +13,8 @@ import com.google.flatbuffers.Constants;
 public class Elevator extends SubsystemBase {
 
   private final ElevatorIO elevator;
-  private final AmpBarIO ampBar;
 
   private final ElevatorIOInputsAutoLogged eInputs = new ElevatorIOInputsAutoLogged();
-  private final AmpBarIOInputsAutoLogged aInputs = new AmpBarIOInputsAutoLogged();
 
   private static final LoggedTunableNumber kP = new LoggedTunableNumber("Elevator/kP");
   private static final LoggedTunableNumber kI = new LoggedTunableNumber("Elevator/kI");
@@ -51,11 +48,9 @@ public class Elevator extends SubsystemBase {
   private double goal;
   // private double barGoalPos;
   private final ElevatorFeedforward elevatorFFModel;
-  private final ArmFeedforward barFFmodel;
 
-  public Elevator(ElevatorIO elevator, AmpBarIO ampBar) {
+  public Elevator(ElevatorIO elevator) {
     this.elevator = elevator;
-    this.ampBar = ampBar;
 
     switch (physicalConstants.getMode()) {
       case REAL:
@@ -126,20 +121,20 @@ public class Elevator extends SubsystemBase {
 
     this.elevator.configurePID(kP.get(), 0, 0);
     elevatorFFModel = new ElevatorFeedforward(kS.get(), kG.get(), kV.get(), kA.get());
-
-    this.ampBar.configurePID(barkP.get(), 0, 0);
-    barFFmodel = new ArmFeedforward(0, barkG.get(), barkV.get(), 0);
   }
 
   public boolean atGoal() {
     return (Math.abs(eInputs.elevatorPosition - goal) <= physicalConstants.ElevatorConstants.THRESHOLD);
   }
 
+<<<<<<< Updated upstream
   public boolean barAtGoal() {
     return (Math.abs(aInputs.barPositionDegrees - barGoal.position)
         <= physicalConstants.ElevatorConstants.BAR_THRESHOLD);
   }
 
+=======
+>>>>>>> Stashed changes
   public double getElevatorPosition() {
     return eInputs.elevatorPosition;
   }
@@ -148,19 +143,11 @@ public class Elevator extends SubsystemBase {
     return eInputs.positionSetpoint - eInputs.elevatorPosition;
   }
 
-  private double getBarError() {
-
-    return aInputs.barPositionSetpointDegrees - aInputs.barPositionDegrees;
-  }
-
-  private double getbarErrorToGoal() {
-    return barGoal.position - aInputs.barPositionDegrees;
-  }
-
   public boolean elevatorAtSetpoint() {
     return (Math.abs(getElevatorError()) <= physicalConstants.ElevatorConstants.THRESHOLD);
   }
 
+<<<<<<< Updated upstream
   public boolean ampBarAtGoal() {
 
     return (Math.abs(getbarErrorToGoal()) <= physicalConstants.ElevatorConstants.BAR_THRESHOLD);
@@ -188,6 +175,12 @@ public class Elevator extends SubsystemBase {
     barGoal = new TrapezoidProfile.State(barGoalDegrees, 0);
     Logger.recordOutput("bar goal", barGoalDegrees);
   }
+=======
+  // public void setbarCurrent(double current) {
+
+  //   barCurrent = new TrapezoidProfile.State(current, 0);
+  // }
+>>>>>>> Stashed changes
 
   public void setExtenderGoal(double setpoint) {
     goal = setpoint;
@@ -224,7 +217,6 @@ public class Elevator extends SubsystemBase {
     Logger.recordOutput("Alliance", DriverStation.getAlliance().isPresent());
 
     elevator.updateInputs(eInputs);
-    ampBar.updateInputs(aInputs);
 
     extenderCurrent =
         extenderProfile.calculate(physicalConstants.LOOP_PERIOD_SECS, extenderCurrent, extenderGoal);
@@ -233,13 +225,7 @@ public class Elevator extends SubsystemBase {
 
     setPositionExtend(extenderCurrent.position, extenderCurrent.velocity);
 
-    setBarPosition(barCurrent.position, barCurrent.velocity);
-
     Logger.processInputs("Elevator", eInputs);
-    Logger.processInputs("Amp bar inputs", aInputs);
-
-    Logger.recordOutput("amp bar error", getBarError());
-    Logger.recordOutput("amp bar goal", barGoal.position);
 
     Logger.recordOutput("amp bar currentPos", barCurrent.position);
     if (kP.hasChanged(hashCode()) || kI.hasChanged(hashCode())) {
@@ -247,8 +233,6 @@ public class Elevator extends SubsystemBase {
     }
     if (barkP.hasChanged(hashCode())
         || barkV.hasChanged(hashCode())
-        || barkG.hasChanged(hashCode())) {
-      ampBar.configurePID(barkP.get(), 0, 0);
-    }
+        || barkG.hasChanged(hashCode())) {}
   }
 }
