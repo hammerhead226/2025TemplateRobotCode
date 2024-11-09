@@ -8,8 +8,6 @@ import frc.robot.physicalConstants;
 import frc.robot.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
-import com.google.flatbuffers.Constants;
-
 public class Elevator extends SubsystemBase {
 
   private final ElevatorIO elevator;
@@ -124,7 +122,8 @@ public class Elevator extends SubsystemBase {
   }
 
   public boolean atGoal() {
-    return (Math.abs(eInputs.elevatorPosition - goal) <= physicalConstants.ElevatorConstants.THRESHOLD);
+    return (Math.abs(eInputs.elevatorPosition - goal)
+        <= physicalConstants.ElevatorConstants.THRESHOLD);
   }
 
   public double getElevatorPosition() {
@@ -181,7 +180,8 @@ public class Elevator extends SubsystemBase {
     elevator.updateInputs(eInputs);
 
     extenderCurrent =
-        extenderProfile.calculate(physicalConstants.LOOP_PERIOD_SECS, extenderCurrent, extenderGoal);
+        extenderProfile.calculate(
+            physicalConstants.LOOP_PERIOD_SECS, extenderCurrent, extenderGoal);
 
     barCurrent = barProfile.calculate(physicalConstants.LOOP_PERIOD_SECS, barCurrent, barGoal);
 

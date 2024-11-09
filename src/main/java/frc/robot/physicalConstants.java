@@ -12,6 +12,7 @@
 // GNU General Public License for more details.
 
 package frc.robot;
+
 import edu.wpi.first.math.util.Units;
 
 public final class physicalConstants {
@@ -24,15 +25,17 @@ public final class physicalConstants {
   public static final String CANBUS = "CAN Bus 2";
   public static final double LOOP_PERIOD_SECS = 0.02;
 
-  public static class SwerveConstants{
+  public static class SwerveConstants {
     public static final double MAX_LINEAR_SPEED = 5.56;
     public static final double TRACK_WIDTH_X_INCHES = Units.inchesToMeters(26.0);
     public static final double TRACK_WIDTH_Y_INCHES = Units.inchesToMeters(26.0);
-    public static final double DRIVE_BASE_RADIUS = Math.hypot(TRACK_WIDTH_X_INCHES / 2.0, TRACK_WIDTH_Y_INCHES / 2.0);
+    public static final double DRIVE_BASE_RADIUS =
+        Math.hypot(TRACK_WIDTH_X_INCHES / 2.0, TRACK_WIDTH_Y_INCHES / 2.0);
     public static final double MAX_ANGULAR_SPEED = 0.45 * MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
     public static final double OPEN_LOOP_RAMP_SEC = 0.05;
   }
-  public static class ModuleConstants{
+
+  public static class ModuleConstants {
     public static final double WHEEL_RADIUS_METERS = Units.inchesToMeters(3.9 / 2.);
 
     public static final double DRIVE_GEAR_RATIO = 6.12;
@@ -48,12 +51,14 @@ public final class physicalConstants {
     public static final double TURN_SUPPLY_CURRENT_LIMIT = 30.0;
     public static final boolean TURN_SUPPLY_CURRENT_LIMIT_ENABLED = true;
   }
-  public static class IntakeConstants{
+
+  public static class IntakeConstants {
     public static final int CURRENT_LIMIT = 40;
     public static final int APPLIED_VOLTAGE = 12;
     public static final boolean CURRENT_LIMIT_ENABLED = true;
   }
-  public static final class shooterConstants{
+
+  public static final class shooterConstants {
     public static final double FEEDER_CURRENT_LIMIT = 40;
     public static final boolean FEEDER_CURRENT_LIMIT_ENABLED = true;
 
@@ -68,7 +73,8 @@ public final class physicalConstants {
     public static final double FLYWHEEL_AMP_RPM = 600;
     public static final double FLYWHEEL_SHOOT_RPM = 3000;
   }
-  public static class ElevatorConstants{
+
+  public static class ElevatorConstants {
     public static final double CURRENT_LIMIT = 40.0;
     public static final boolean CURRENT_LIMIT_ENABLED = true;
 
@@ -81,19 +87,22 @@ public final class physicalConstants {
     public static final double REDUCTION = (25.0 / 1.0);
     public static final double BAR_THRESHOLD = 3;
   }
-  public static final class PivotConstants{
+
+  public static final class PivotConstants {
     public static final double CURRENT_LIMIT = 35.0;
     public static final boolean CURRENT_LIMIT_ENABLED = true;
 
     public static final double THRESHOLD = 1;
     public static final double[] PID = {0, 0, 0};
-    public static final double REDUCTION = (15.0 / 1.0) * (34.0 / 24.0) * (24.0 / 18.0) * (50.0 / 14.0);
+    public static final double REDUCTION =
+        (15.0 / 1.0) * (34.0 / 24.0) * (24.0 / 18.0) * (50.0 / 14.0);
     public static final double STOW_SETPOINT_DEG = 50.7;
     public static final double INTAKE_SETPOINT_DEG = 59.0;
 
     public static final double PIVOT_ZERO_ANGLE = 59;
   }
-  public static class LEDConstants{
+
+  public static class LEDConstants {
     public static final double COLOR_BLUE = 0.87;
     public static final double COLOR_RED = 0.61;
     public static final double COLOR_YELLOW = 0.66;
@@ -132,5 +141,4 @@ public final class physicalConstants {
       case REPLAY -> Mode.REPLAY;
     };
   }
-
 }

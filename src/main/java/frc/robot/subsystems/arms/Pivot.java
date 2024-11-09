@@ -4,13 +4,12 @@
 
 package frc.robot.subsystems.arms;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.physicalConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class Pivot extends SubsystemBase {
   private final PivotIO pivot;
@@ -118,7 +117,7 @@ public class Pivot extends SubsystemBase {
 
     pivotCurrentStateDegrees =
         pivotProfile.calculate(
-          physicalConstants.LOOP_PERIOD_SECS, pivotCurrentStateDegrees, pivotGoalStateDegrees);
+            physicalConstants.LOOP_PERIOD_SECS, pivotCurrentStateDegrees, pivotGoalStateDegrees);
 
     setPositionDegs(pivotCurrentStateDegrees.position, pivotCurrentStateDegrees.velocity);
 

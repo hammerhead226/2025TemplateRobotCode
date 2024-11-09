@@ -9,8 +9,6 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.google.flatbuffers.Constants;
-
 import frc.robot.physicalConstants;
 import frc.robot.util.Conversions;
 
@@ -28,7 +26,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     TalonFXConfiguration config = new TalonFXConfiguration();
     config.CurrentLimits.StatorCurrentLimit = physicalConstants.ElevatorConstants.CURRENT_LIMIT;
     config.CurrentLimits.StatorCurrentLimitEnable =
-    physicalConstants.ElevatorConstants.CURRENT_LIMIT_ENABLED;
+        physicalConstants.ElevatorConstants.CURRENT_LIMIT_ENABLED;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
 
@@ -54,11 +52,15 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   public void updateInputs(ElevatorIOInputs inputs) {
     BaseStatusSignal.refreshAll(elevatorPosition, elevatorVelocity, appliedVolts, currentAmps);
     inputs.elevatorPosition =
-    Conversions.motorRotToInches(
-            elevatorPosition.getValueAsDouble(), 5.97, physicalConstants.ElevatorConstants.REDUCTION);
+        Conversions.motorRotToInches(
+            elevatorPosition.getValueAsDouble(),
+            5.97,
+            physicalConstants.ElevatorConstants.REDUCTION);
     inputs.elevatorVelocity =
-    Conversions.motorRotToInches(
-            elevatorVelocity.getValueAsDouble() * 60., 5.97, physicalConstants.ElevatorConstants.REDUCTION);
+        Conversions.motorRotToInches(
+            elevatorVelocity.getValueAsDouble() * 60.,
+            5.97,
+            physicalConstants.ElevatorConstants.REDUCTION);
     inputs.appliedVolts = appliedVolts.getValueAsDouble();
     inputs.currentAmps = currentAmps.getValueAsDouble();
     inputs.positionSetpoint = positionSetpoint;
@@ -74,7 +76,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     this.positionSetpoint = position;
     leader.setControl(
         new PositionVoltage(
-          Conversions.inchesToMotorRot(position, 5.97, physicalConstants.ElevatorConstants.REDUCTION),
+            Conversions.inchesToMotorRot(
+                position, 5.97, physicalConstants.ElevatorConstants.REDUCTION),
             0,
             false,
             ffVolts,

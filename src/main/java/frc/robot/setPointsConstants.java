@@ -1,5 +1,3 @@
 package frc.robot;
 
-public class setPointsConstants {
-    
-}
+public class setPointsConstants {}

@@ -1,7 +1,5 @@
 package frc.robot.subsystems.arms;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
@@ -14,9 +12,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import frc.robot.physicalConstants;
 import frc.robot.util.Conversions;
+import org.littletonrobotics.junction.Logger;
 
 public class PivotIOTalonFX implements PivotIO {
   private final TalonFX leader;
@@ -37,7 +35,8 @@ public class PivotIOTalonFX implements PivotIO {
   public PivotIOTalonFX(int leadID, int followID, int gyroID) {
     TalonFXConfiguration config = new TalonFXConfiguration();
     config.CurrentLimits.StatorCurrentLimit = physicalConstants.PivotConstants.CURRENT_LIMIT;
-    config.CurrentLimits.StatorCurrentLimitEnable = physicalConstants.PivotConstants.CURRENT_LIMIT_ENABLED;
+    config.CurrentLimits.StatorCurrentLimitEnable =
+        physicalConstants.PivotConstants.CURRENT_LIMIT_ENABLED;
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
@@ -55,7 +54,7 @@ public class PivotIOTalonFX implements PivotIO {
     startAngleDegs = pitch.getValueAsDouble();
 
     leader.setPosition(
-      Conversions.degreesToFalcon(startAngleDegs, physicalConstants.PivotConstants.REDUCTION));
+        Conversions.degreesToFalcon(startAngleDegs, physicalConstants.PivotConstants.REDUCTION));
 
     follower.setPosition(
         Conversions.degreesToFalcon(startAngleDegs, physicalConstants.PivotConstants.REDUCTION));
@@ -91,14 +90,14 @@ public class PivotIOTalonFX implements PivotIO {
         Conversions.falconToDegrees(
                 (leaderPositionDegs.getValueAsDouble()), physicalConstants.PivotConstants.REDUCTION)
             + physicalConstants.PivotConstants.PIVOT_ZERO_ANGLE;
-            
 
     // inputs.velocityDegsPerSec =
     //     Conversions.falconToDegrees(
     //         (followPositionDegs.getValueAsDouble()), Constants.PivotConstants.REDUCTION);
     inputs.velocityDegsPerSec =
         Conversions.falconToDegrees(
-            velocityDegsPerSec.getValueAsDouble() * 2048, physicalConstants.PivotConstants.REDUCTION);
+            velocityDegsPerSec.getValueAsDouble() * 2048,
+            physicalConstants.PivotConstants.REDUCTION);
     inputs.appliedVolts = appliedVolts.getValueAsDouble();
     inputs.currentAmps = currentAmps.getValueAsDouble();
     inputs.positionSetpointDegs = positionSetpointDegs;
@@ -122,7 +121,8 @@ public class PivotIOTalonFX implements PivotIO {
     this.positionSetpointDegs = positionDegs;
     leader.setControl(
         new PositionVoltage(
-            Conversions.degreesToFalcon(positionDegs - 59, physicalConstants.PivotConstants.REDUCTION),
+            Conversions.degreesToFalcon(
+                positionDegs - 59, physicalConstants.PivotConstants.REDUCTION),
             0,
             false,
             ffVolts,

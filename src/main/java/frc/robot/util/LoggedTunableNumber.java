@@ -1,11 +1,9 @@
 package frc.robot.util;
 
+import frc.robot.physicalConstants;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
-
-import frc.robot.physicalConstants;
 
 /**
  * Class for a tunable number. Gets value from dashboard in tuning mode, returns default if not or
