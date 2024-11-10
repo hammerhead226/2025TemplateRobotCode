@@ -17,15 +17,10 @@ import frc.robot.util.LimelightHelpers.RawFiducial;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-
 import org.littletonrobotics.junction.Logger;
-
 import frc.robot.subsystems.drive.GyroIO;
-import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOTalonFX;
-
 import frc.robot.physicalConstants;
 
 public class Vision extends SubsystemBase {
