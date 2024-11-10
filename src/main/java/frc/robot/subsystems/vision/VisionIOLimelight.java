@@ -26,22 +26,6 @@ public class VisionIOLimelight implements VisionIO {
     inputs.avgTagArea =
         LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(physicalConstants.LL_ALIGN).avgTagArea;
 
-    // Raw Limelight Data
-    inputs.iTX = LimelightHelpers.getTX(physicalConstants.LL_INTAKE);
-    inputs.iTY = LimelightHelpers.getTY(physicalConstants.LL_INTAKE);
-    inputs.iTA = LimelightHelpers.getTA(physicalConstants.LL_INTAKE);
-    inputs.iHB =
-        LimelightHelpers.getLimelightNTTableEntry(physicalConstants.LL_INTAKE, "hb").getDouble(0.0);
-    inputs.iTV = LimelightHelpers.getTV(physicalConstants.LL_INTAKE);
-    inputs.iPIPELINELATENCY = LimelightHelpers.getLatency_Pipeline(physicalConstants.LL_INTAKE);
-    inputs.iCAPTURELATENCY = LimelightHelpers.getLatency_Capture(physicalConstants.LL_INTAKE);
-    inputs.iTHOR =
-        LimelightHelpers.getLimelightNTTableEntry(physicalConstants.LL_INTAKE, "thor")
-            .getDouble(0.0);
-    inputs.iTVERT =
-        LimelightHelpers.getLimelightNTTableEntry(physicalConstants.LL_INTAKE, "tvert")
-            .getDouble(0.0);
-
     inputs.aTX = LimelightHelpers.getTX(physicalConstants.LL_ALIGN);
     inputs.aTY = LimelightHelpers.getTY(physicalConstants.LL_ALIGN);
     inputs.aTA = LimelightHelpers.getTA(physicalConstants.LL_ALIGN);

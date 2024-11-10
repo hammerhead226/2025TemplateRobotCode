@@ -1,6 +1,5 @@
 package frc.robot.subsystems.vision;
 
-import com.google.flatbuffers.Constants;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -10,6 +9,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
+import frc.robot.physicalConstants;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightHelpers.PoseEstimate;
 import frc.robot.util.LimelightHelpers.RawFiducial;
@@ -35,7 +35,7 @@ public class Vision extends SubsystemBase {
   public void periodic() {
     visionIO.updateInputs(visionInputs);
     LimelightHelpers.SetRobotOrientation(
-        Constants.LL_ALIGN,
+        physicalConstants.LL_ALIGN,
         RobotContainer.drive.poseEstimator.getEstimatedPosition().getRotation().getDegrees(),
         0,
         0,

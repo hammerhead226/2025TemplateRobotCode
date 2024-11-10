@@ -62,6 +62,7 @@ public class Drive extends SubsystemBase {
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
   private final SysIdRoutine sysId;
+  public double yawVelocityRadPerSec = gyroInputs.yawVelocityRadPerSec;
 
   private final PIDController rotationController;
   static final Lock odometryLock = new ReentrantLock();
