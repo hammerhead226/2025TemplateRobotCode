@@ -73,8 +73,6 @@ public final class physicalConstants {
     public static final boolean FLYWHEEL_CURRENT_LIMIT_ENABLED = true;
 
     public static final double FLYWHEEL_THRESHOLD = 200;
-
-    public static final double FLYWHEEL_AMP_RPM = 600;
     public static final double FLYWHEEL_SHOOT_RPM = 3000;
   }
 

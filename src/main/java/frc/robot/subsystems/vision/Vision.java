@@ -42,9 +42,6 @@ public class Vision extends SubsystemBase {
         0,
         0,
         0);
-    Logger.recordOutput(
-        "vision something", DriverStation.getAlliance().isPresent() && visionInputs.aTV);
-    Logger.recordOutput("isDisabled", DriverStation.isDisabled());
 
     if (DriverStation.getAlliance().isPresent() && visionInputs.aTV) {
       Logger.recordOutput(
@@ -146,9 +143,6 @@ public class Vision extends SubsystemBase {
     }
 
     Logger.recordOutput("Vision Measurement", limelightMeasurement.pose);
-
-    addVisionMeasurement(
-        pose, limelightMeasurement.timestampSeconds - (limelightMeasurement.latency / 1000.));
   }
 
   public double getVisionPoseDifference(Pose2d visionPose) {
@@ -167,9 +161,5 @@ public class Vision extends SubsystemBase {
       return true;
     }
     return false;
-  }
-
-  public void addVisionMeasurement(Pose2d visionPose, double timestamp) {
-    RobotContainer.drive.poseEstimator.addVisionMeasurement(visionPose, timestamp);
   }
 }
