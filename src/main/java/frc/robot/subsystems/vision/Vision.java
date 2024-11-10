@@ -14,27 +14,47 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightHelpers.PoseEstimate;
 import frc.robot.util.LimelightHelpers.RawFiducial;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.GyroIOPigeon2;
+import frc.robot.subsystems.drive.ModuleIOTalonFX;
+
+import org.littletonrobotics.junction.Logger;
+
+import frc.robot.subsystems.drive.GyroIO;
+import frc.robot.subsystems.drive.GyroIOPigeon2;
+import frc.robot.subsystems.drive.ModuleIO;
+import frc.robot.subsystems.drive.ModuleIOSim;
+import frc.robot.subsystems.drive.ModuleIOTalonFX;
+
+import frc.robot.physicalConstants;
 
 public class Vision extends SubsystemBase {
     private static double multiplier = 1.0;
     private static boolean toggle = false;
 
-    private NOTE_POSITIONS targetNote;
-
     private boolean overridePathplanner = false;
 
-    private NetworkTable limelightintake =
-      NetworkTableInstance.getDefault().getTable(Constants.LL_INTAKE);
+    // private NetworkTable limelightintake =
+    //   NetworkTableInstance.getDefault().getTable(physicalConstants.LL_INTAKE);
 
     private final VisionIO visionIO;
     private final VisionIOInputsAutoLogged visionInputs = new VisionIOInputsAutoLogged();
 
-    public Vision(){
-        VisionIO visionIO,
+    public Vision(VisionIO visionIO){
+        this.visionIO = visionIO;
+        Drive drive = 
+        new Drive(
+            new GyroIOPigeon2(),
+            new VisionIOLimelight(),
+            new ModuleIO(0),
+            new ModuleIO(1),
+            new ModuleIO(2),
+            new ModuleIO(3));
     }
 
     @Override
     public void periodic() {
+        visionIO.updateInputs(visionInputs);
         LimelightHelpers.SetRobotOrientation(
             Constants.LL_ALIGN,
             poseEstimator.getEstimatedPosition().getRotation().getDegrees(),
@@ -172,7 +192,5 @@ public class Vision extends SubsystemBase {
     public void addVisionMeasurement(Pose2d visionPose, double timestamp) {
         poseEstimator.addVisionMeasurement(visionPose, timestamp);
     }
-
-    
 
 }
