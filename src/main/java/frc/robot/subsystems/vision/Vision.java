@@ -1,119 +1,99 @@
 package frc.robot.subsystems.vision;
 
 import com.google.flatbuffers.Constants;
-
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightHelpers.PoseEstimate;
 import frc.robot.util.LimelightHelpers.RawFiducial;
-import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.GyroIOPigeon2;
-import frc.robot.subsystems.drive.ModuleIOTalonFX;
-
 import org.littletonrobotics.junction.Logger;
 
-import frc.robot.subsystems.drive.GyroIO;
-import frc.robot.subsystems.drive.GyroIOPigeon2;
-import frc.robot.subsystems.drive.ModuleIO;
-import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOTalonFX;
-
-import frc.robot.physicalConstants;
-
 public class Vision extends SubsystemBase {
-    private static double multiplier = 1.0;
-    private static boolean toggle = false;
+  private static double multiplier = 1.0;
+  private static boolean toggle = false;
 
-    private boolean overridePathplanner = false;
+  private boolean overridePathplanner = false;
 
-    // private NetworkTable limelightintake =
-    //   NetworkTableInstance.getDefault().getTable(physicalConstants.LL_INTAKE);
+  // private NetworkTable limelightintake =
+  //   NetworkTableInstance.getDefault().getTable(physicalConstants.LL_INTAKE);
 
-    private final VisionIO visionIO;
-    private final VisionIOInputsAutoLogged visionInputs = new VisionIOInputsAutoLogged();
+  private final VisionIO visionIO;
+  private final VisionIOInputsAutoLogged visionInputs = new VisionIOInputsAutoLogged();
 
-    public Vision(VisionIO visionIO){
-        this.visionIO = visionIO;
-        Drive drive = 
-        new Drive(
-            new GyroIOPigeon2(),
-            new VisionIOLimelight(),
-            new ModuleIO(0),
-            new ModuleIO(1),
-            new ModuleIO(2),
-            new ModuleIO(3));
+  public Vision(VisionIO visionIO) {
+    this.visionIO = visionIO;
+  }
+
+  @Override
+  public void periodic() {
+    visionIO.updateInputs(visionInputs);
+    LimelightHelpers.SetRobotOrientation(
+        Constants.LL_ALIGN,
+        RobotContainer.drive.poseEstimator.getEstimatedPosition().getRotation().getDegrees(),
+        0,
+        0,
+        0,
+        0,
+        0);
+    Logger.recordOutput(
+        "vision something", DriverStation.getAlliance().isPresent() && visionInputs.aTV);
+    Logger.recordOutput("isDisabled", DriverStation.isDisabled());
+
+    if (DriverStation.getAlliance().isPresent() && visionInputs.aTV) {
+      Logger.recordOutput(
+          "tags > 1 or disabled ", visionInputs.tagCount > 1 || DriverStation.isDisabled());
+
+      if (visionInputs.tagCount > 1 || DriverStation.isDisabled()) {
+        visionLogic();
+      } else {
+        // mt2TagFiltering();
+        visionLogic();
+      }
+    }
+  }
+
+  public void mt2TagFiltering() {
+    boolean doRejectUpdate = false;
+
+    LimelightHelpers.PoseEstimate mt2 =
+        new PoseEstimate(
+            visionInputs.mt2VisionPose,
+            visionInputs.timestampSeconds,
+            visionInputs.latency,
+            visionInputs.tagCount,
+            visionInputs.tagSpan,
+            visionInputs.avgTagDist,
+            visionInputs.avgTagArea,
+            new RawFiducial[] {});
+    if (Math.abs(RobotContainer.drive.yawVelocityRadPerSec) > Math.toRadians(360)) {
+      doRejectUpdate = true;
     }
 
-    @Override
-    public void periodic() {
-        visionIO.updateInputs(visionInputs);
-        LimelightHelpers.SetRobotOrientation(
-            Constants.LL_ALIGN,
-            poseEstimator.getEstimatedPosition().getRotation().getDegrees(),
-            0,
-            0,
-            0,
-            0,
-            0);
-        Logger.recordOutput(
-            "vision something", DriverStation.getAlliance().isPresent() && visionInputs.aTV);
-        Logger.recordOutput("isDisabled", DriverStation.isDisabled());
-    
-        if (DriverStation.getAlliance().isPresent() && visionInputs.aTV) {
-          Logger.recordOutput(
-              "tags > 1 or disabled ", visionInputs.tagCount > 1 || DriverStation.isDisabled());
-    
-          if (visionInputs.tagCount > 1 || DriverStation.isDisabled()) {
-            visionLogic();
-          } else {
-            // mt2TagFiltering();
-            visionLogic();
-          }
-    }
+    if (mt2.tagCount == 0) {
+      doRejectUpdate = true;
     }
 
-    public void mt2TagFiltering() {
-        boolean doRejectUpdate = false;
-
-        LimelightHelpers.PoseEstimate mt2 =
-            new PoseEstimate(
-                visionInputs.mt2VisionPose,
-                visionInputs.timestampSeconds,
-                visionInputs.latency,
-                visionInputs.tagCount,
-                visionInputs.tagSpan,
-                visionInputs.avgTagDist,
-                visionInputs.avgTagArea,
-                new RawFiducial[] {});
-        if (Math.abs(gyroInputs.yawVelocityRadPerSec) > Math.toRadians(360)) {
-        doRejectUpdate = true;
-        }
-
-        if (mt2.tagCount == 0) {
-        doRejectUpdate = true;
-        }
-
-        if (mt2.pose.getTranslation().getDistance(new Translation2d(7.9, 4.1)) < 0.4) {
-        doRejectUpdate = true;
-        }
-
-        if (!doRejectUpdate) {
-        poseEstimator.setVisionMeasurementStdDevs(
-            VecBuilder.fill(0.7, 0.7, Units.degreesToRadians(9999999)));
-        poseEstimator.addVisionMeasurement(mt2.pose, mt2.timestampSeconds - (mt2.latency / 1000.));
-        }
-
-        Logger.recordOutput("Vision Measurement", mt2.pose);
-        Logger.recordOutput("Rejecting Tags", doRejectUpdate);
+    if (mt2.pose.getTranslation().getDistance(new Translation2d(7.9, 4.1)) < 0.4) {
+      doRejectUpdate = true;
     }
+
+    if (!doRejectUpdate) {
+      RobotContainer.drive.poseEstimator.setVisionMeasurementStdDevs(
+          VecBuilder.fill(0.7, 0.7, Units.degreesToRadians(9999999)));
+      RobotContainer.drive.poseEstimator.addVisionMeasurement(
+          mt2.pose, mt2.timestampSeconds - (mt2.latency / 1000.));
+    }
+
+    Logger.recordOutput("Vision Measurement", mt2.pose);
+    Logger.recordOutput("Rejecting Tags", doRejectUpdate);
+  }
 
   public void visionLogic() {
     LimelightHelpers.PoseEstimate limelightMeasurement =
@@ -156,7 +136,7 @@ public class Vision extends SubsystemBase {
 
     Logger.recordOutput("number of tags", limelightMeasurement.tagCount);
 
-    poseEstimator.setVisionMeasurementStdDevs(
+    RobotContainer.drive.poseEstimator.setVisionMeasurementStdDevs(
         VecBuilder.fill(xMeterStds, yMeterStds, Units.degreesToRadians(headingDegStds)));
 
     Pose2d pose = limelightMeasurement.pose;
@@ -169,28 +149,27 @@ public class Vision extends SubsystemBase {
 
     addVisionMeasurement(
         pose, limelightMeasurement.timestampSeconds - (limelightMeasurement.latency / 1000.));
-    }
+  }
 
-    public double getVisionPoseDifference(Pose2d visionPose) {
-        return getPose().getTranslation().getDistance(visionPose.getTranslation());
-      }
-    
-      public boolean acceptableMeasurements(Pose2d visionMeasurement) {
-        return Math.abs(visionMeasurement.getX() - getPose().getX()) < 1
-            && Math.abs(visionMeasurement.getY() - getPose().getY()) < 1;
-      }
-    
-      public boolean canCorrect(Pose2d visionMeasurement, double timeSinceLastCorrection) {
-        if (timeSinceLastCorrection < 5) {
-          if (acceptableMeasurements(visionMeasurement)) return true;
-        } else {
-          return true;
-        }
-        return false;
-    }
+  public double getVisionPoseDifference(Pose2d visionPose) {
+    return RobotContainer.drive.getPose().getTranslation().getDistance(visionPose.getTranslation());
+  }
 
-    public void addVisionMeasurement(Pose2d visionPose, double timestamp) {
-        poseEstimator.addVisionMeasurement(visionPose, timestamp);
-    }
+  public boolean acceptableMeasurements(Pose2d visionMeasurement) {
+    return Math.abs(visionMeasurement.getX() - RobotContainer.drive.getPose().getX()) < 1
+        && Math.abs(visionMeasurement.getY() - RobotContainer.drive.getPose().getY()) < 1;
+  }
 
+  public boolean canCorrect(Pose2d visionMeasurement, double timeSinceLastCorrection) {
+    if (timeSinceLastCorrection < 5) {
+      if (acceptableMeasurements(visionMeasurement)) return true;
+    } else {
+      return true;
+    }
+    return false;
+  }
+
+  public void addVisionMeasurement(Pose2d visionPose, double timestamp) {
+    RobotContainer.drive.poseEstimator.addVisionMeasurement(visionPose, timestamp);
+  }
 }

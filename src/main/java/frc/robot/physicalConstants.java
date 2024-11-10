@@ -24,7 +24,6 @@ public final class physicalConstants {
   public static final boolean tuningMode = true;
   public static final String CANBUS = "CAN Bus 2";
   public static final double LOOP_PERIOD_SECS = 0.02;
-  
 
   public static class SwerveConstants {
     public static final double MAX_LINEAR_SPEED = 5.56;

@@ -14,6 +14,7 @@
 package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -38,17 +39,22 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.physicalConstants;
 import frc.robot.util.LocalADStarAK;
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
-  private static final double MAX_LINEAR_SPEED = physicalConstants.SwerveConstants.MAX_LINEAR_SPEED * 0.85;
-  private static final double TRACK_WIDTH_X = physicalConstants.SwerveConstants.TRACK_WIDTH_X_METERS;
-  private static final double TRACK_WIDTH_Y = physicalConstants.SwerveConstants.TRACK_WIDTH_Y_METERS;
-  private static final double DRIVE_BASE_RADIUS = physicalConstants.SwerveConstants.DRIVE_BASE_RADIUS;
-  private static final double MAX_ANGULAR_SPEED = physicalConstants.SwerveConstants.MAX_ANGULAR_SPEED;
+  private static final double MAX_LINEAR_SPEED =
+      physicalConstants.SwerveConstants.MAX_LINEAR_SPEED * 0.85;
+  private static final double TRACK_WIDTH_X =
+      physicalConstants.SwerveConstants.TRACK_WIDTH_X_METERS;
+  private static final double TRACK_WIDTH_Y =
+      physicalConstants.SwerveConstants.TRACK_WIDTH_Y_METERS;
+  private static final double DRIVE_BASE_RADIUS =
+      physicalConstants.SwerveConstants.DRIVE_BASE_RADIUS;
+  private static final double MAX_ANGULAR_SPEED =
+      physicalConstants.SwerveConstants.MAX_ANGULAR_SPEED;
   private static double multiplier = 1.0;
   private static boolean toggle = false;
 
@@ -154,7 +160,7 @@ public class Drive extends SubsystemBase {
     rotationController.setTolerance(5);
     rotationController.enableContinuousInput(-180, 180);
     robotPoseBuffer = new CircularBuffer<>(11);
-}
+  }
 
   public void periodic() {
     odometryLock.lock(); // Prevents odometry updates while reading data
