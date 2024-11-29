@@ -24,6 +24,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.setMotorTarget;
+import frc.robot.subsystems.arms.Pivot;
+import frc.robot.subsystems.arms.PivotIOTalonFX;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -34,6 +37,8 @@ import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.flywheel.FlywheelIO;
 import frc.robot.subsystems.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.flywheel.FlywheelIOSparkMax;
+import frc.robot.subsystems.genericSubsystem.fakeMechanism;
+import frc.robot.subsystems.genericSubsystem.fakeMechanismIOTalonFX;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
@@ -47,7 +52,8 @@ public class RobotContainer {
   // Subsystems
   public static Drive drive;
   private final Flywheel flywheel;
-
+  private final fakeMechanism motorM;
+  public Pivot pivot = new Pivot(new PivotIOTalonFX(1, 2, 3));
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
 
@@ -69,6 +75,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(2),
                 new ModuleIOTalonFX(3));
         flywheel = new Flywheel(new FlywheelIOSparkMax());
+        motorM = new fakeMechanism(new fakeMechanismIOTalonFX());
         // drive = new Drive(
         // new GyroIOPigeon2(true),
         // new ModuleIOTalonFX(0),
@@ -88,6 +95,7 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim());
         flywheel = new Flywheel(new FlywheelIOSim());
+        motorM = new fakeMechanism(new fakeMechanismIOTalonFX());
         break;
 
       default:
@@ -100,6 +108,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         flywheel = new Flywheel(new FlywheelIO() {});
+        motorM = new fakeMechanism(new fakeMechanismIOTalonFX());
         break;
     }
 
@@ -160,11 +169,9 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
-    controller
-        .a()
-        .whileTrue(
-            Commands.startEnd(
-                () -> flywheel.runVelocity(flywheelSpeedInput.get()), flywheel::stop, flywheel));
+    controller.a().whileTrue(new setMotorTarget(motorM, 2, 10));
+
+    controller.a().onFalse(new setMotorTarget(motorM, 2, 0));
   }
 
   /**

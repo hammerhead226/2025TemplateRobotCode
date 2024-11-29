@@ -9,6 +9,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.hardware.core.CoreTalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -78,6 +79,16 @@ public class PivotIOTalonFX implements PivotIO {
         100, leaderPositionDegs, velocityDegsPerSec, appliedVolts, currentAmps, pitch);
 
     // setBrakeMode(false);
+  }
+
+  public int getMotorID() {
+
+    return leader.getDeviceID();
+  }
+
+  public CoreTalonFX getmotor() {
+
+    return leader;
   }
 
   @Override

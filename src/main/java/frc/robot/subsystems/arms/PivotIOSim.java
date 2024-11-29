@@ -4,16 +4,24 @@
 
 package frc.robot.subsystems.arms;
 
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import frc.robot.RobotContainer;
 import frc.robot.physicalConstants;
 
 /** Add your docs here. */
 public class PivotIOSim implements PivotIO {
   private final DCMotor pivotGearbox = DCMotor.getFalcon500(2);
+  private final DCMotorSim motorSimModel = new DCMotorSim(pivotGearbox, 1, 2);
+  public RobotContainer robotContainer = new RobotContainer();
+  private final TalonFXSimState falcon = new TalonFXSimState(new TalonFX(0));
+
   private final SingleJointedArmSim sim =
       new SingleJointedArmSim(
           pivotGearbox,
@@ -57,6 +65,7 @@ public class PivotIOSim implements PivotIO {
   @Override
   public void setPositionSetpointDegs(double positionDegs, double ffVolts) {
     appliedVolts = ffVolts;
+
     pid.setSetpoint(Math.toRadians(positionDegs));
   }
 

@@ -5,25 +5,28 @@ import org.littletonrobotics.junction.AutoLog;
 public interface fakeMechanismIO {
   @AutoLog
   public static class fakeMechanismIOInputs {
-   // add a double positionRad
-   //add a double velocityRadPerSec 
-   //add a double appliedVolts
-   //add a double currentAmps 
+    public double positionRad = 0.0;
+    public double velocityRadPerSec = 0.0;
+    public double appliedVolts = 0.0;
+    public double currentAmps = 0.0;
   }
 
-  //ALL PARAMETERS SHOULD BE DOUBLES 
-
- //update inputs parameters:fakeMechanismIOInputs
+  public default void updateInputs(fakeMechanismIOInputs inputs) {}
 
   /** Run open loop at the specified voltage. */
-  //setVoltage parameters: a double volts
+  public default void setVoltage(double volts) {}
 
   /** Run closed loop at the specified velocity. */
-  //setVelocity parameters: velocityRadPerSec and ffVolts
+  public default void setVelocity(double velocityRadPerSec, double ffVolts) {}
 
   /** Stop in open loop. */
-  //stop method, no parameters
+  public default void stop() {}
 
   /** Set velocity PID constants. */
-  //configurePID parameters: kP, kI, kD
+  public default void configurePID(double kP, double kI, double kD) {}
+
+  /** create a set position method here * */
+  // should have a double parameter called goalRevolutions and feedforward volts
+
+  public default void setPosition(double goalRevolutions, double volts) {}
 }

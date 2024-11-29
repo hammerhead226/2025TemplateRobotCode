@@ -1,21 +1,24 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems.genericSubsystem;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.physicalConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class fakeMechanism extends SubsystemBase {
   /** Creates a new fakeMechanism. */
   private final fakeMechanismIO io;
+
   private final fakeMechanismIOInputsAutoLogged fmInputs = new fakeMechanismIOInputsAutoLogged();
   private final SimpleMotorFeedforward ffModel;
+
+  private TrapezoidProfile motorProfile;
+
+  private TrapezoidProfile.Constraints motorConstraints = new TrapezoidProfile.Constraints(30, 85);
+
+  private TrapezoidProfile.State motorGoal = new TrapezoidProfile.State();
+  private TrapezoidProfile.State motorCurrent = new TrapezoidProfile.State();
 
   public fakeMechanism(fakeMechanismIO io) {
     this.io = io;
@@ -34,23 +37,45 @@ public class fakeMechanism extends SubsystemBase {
         break;
     }
 
+    motorProfile = new TrapezoidProfile(motorConstraints);
+    motorCurrent = motorProfile.calculate(0, motorCurrent, motorGoal);
+  }
+
+  public double getMotorPosition() {
+
+    return fmInputs.positionRad;
+  }
+
+  public void runMotor() {
+
+    io.setVelocity(200, ffModel.calculate(200));
+
+    // Log flywheel setpoint
+    Logger.recordOutput("Flywheel/SetpointRPM", 200);
+  }
+
+  public void motorStop() {
+
+    io.stop();
+  }
+
+  public void setPositionGoal(double goal) {
+    motorGoal = new TrapezoidProfile.State(goal, 0);
+  }
+
+  public void setPosition(double position, double velocity) {
+    io.setPosition(position, ffModel.calculate(velocity));
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-     io.updateInputs(fmInputs);
+    io.updateInputs(fmInputs);
     Logger.processInputs("Flywheel", fmInputs);
-  }
-//provide implementation for runMotor
-//set the velocity of the motor to 200 and the ffVolts to the feed forward models calculations
-//to get feed forward volts use ffModel.calculate
-//record the velocity to advantage scope using Logger.recordOutput("give it a sensible name", 200)
 
-  public void runMotor(){
-         
-    
-    // Log motor setpoint
-   
+    motorCurrent =
+        motorProfile.calculate(physicalConstants.LOOP_PERIOD_SECS, motorCurrent, motorGoal);
+
+    setPosition(motorCurrent.position, motorCurrent.velocity);
   }
 }
