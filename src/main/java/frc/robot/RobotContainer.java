@@ -169,7 +169,7 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
-    controller.a().whileTrue(new setMotorTarget(motorM, 2, 10));
+    controller.a().whileTrue(new setMotorTarget(motorM, 2, 50));
 
     controller.a().onFalse(new setMotorTarget(motorM, 2, 0));
   }

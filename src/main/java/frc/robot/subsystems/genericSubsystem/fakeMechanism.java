@@ -2,6 +2,7 @@ package frc.robot.subsystems.genericSubsystem;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.physicalConstants;
 import org.littletonrobotics.junction.Logger;
@@ -19,6 +20,9 @@ public class fakeMechanism extends SubsystemBase {
 
   private TrapezoidProfile.State motorGoal = new TrapezoidProfile.State();
   private TrapezoidProfile.State motorCurrent = new TrapezoidProfile.State();
+
+  private final fakeMechanismVisualizer measuredVisualizer;
+  private final fakeMechanismVisualizer goalVisualizer;
 
   public fakeMechanism(fakeMechanismIO io) {
     this.io = io;
@@ -39,6 +43,9 @@ public class fakeMechanism extends SubsystemBase {
 
     motorProfile = new TrapezoidProfile(motorConstraints);
     motorCurrent = motorProfile.calculate(0, motorCurrent, motorGoal);
+
+    measuredVisualizer = new fakeMechanismVisualizer("measured", Color.kBlack);
+    goalVisualizer = new fakeMechanismVisualizer("goal", Color.kGreen);
   }
 
   public double getMotorPosition() {
@@ -77,5 +84,8 @@ public class fakeMechanism extends SubsystemBase {
         motorProfile.calculate(physicalConstants.LOOP_PERIOD_SECS, motorCurrent, motorGoal);
 
     setPosition(motorCurrent.position, motorCurrent.velocity);
+
+    measuredVisualizer.update(motorCurrent.position);
+    goalVisualizer.update(motorGoal.position);
   }
 }
