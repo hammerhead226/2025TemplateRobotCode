@@ -13,17 +13,19 @@ import frc.robot.physicalConstants;
 
 /** Add your docs here. */
 public class PivotIOSim implements PivotIO {
-  private final DCMotor pivotGearbox = DCMotor.getFalcon500(2);
-  private final SingleJointedArmSim sim =
-      new SingleJointedArmSim(
-          pivotGearbox,
-          5,
-          SingleJointedArmSim.estimateMOI(Units.inchesToMeters(20), 0.1),
-          Units.inchesToMeters(20),
-          0,
-          Math.PI,
-          true,
-          0);
+
+  //SIM VARIABLES
+  private int gearBoxMotorCount = 2;
+  private double gearing = 5;
+  private double armLength = Units.inchesToMeters(20);
+  private double momentOfInertia = SingleJointedArmSim.estimateMOI(armLength, 0.1);
+  private double minAngleRadians = 0;
+  private double maxAngleRadians = Math.PI;
+  private boolean simulateGravity = true;
+  private double startingAngleRads = 0.0;
+
+  private final DCMotor pivotGearbox = DCMotor.getFalcon500(gearBoxMotorCount);
+  private final SingleJointedArmSim sim = new SingleJointedArmSim(pivotGearbox, gearing, momentOfInertia, armLength, minAngleRadians, maxAngleRadians, simulateGravity, startingAngleRads);
   private final PIDController pid = new PIDController(0, 0, 0);
 
   private double currentAmps = 0.0;
@@ -32,12 +34,15 @@ public class PivotIOSim implements PivotIO {
   private double positionRads = 0.0;
   private double positionSetpointRads = 0.0;
 
+  private double clampedValueLowVolts = -12.0;
+  private double clampedValueHighVolts = 12.0;
+
   @Override
   public void updateInputs(PivotIOInputs inputs) {
     positionSetpointRads = pid.getSetpoint();
 
     appliedVolts +=
-        MathUtil.clamp(pid.calculate(sim.getAngleRads(), positionSetpointRads), -12.0, 12);
+        MathUtil.clamp(pid.calculate(sim.getAngleRads(), positionSetpointRads), clampedValueLowVolts, clampedValueHighVolts);
 
     sim.setInputVoltage(appliedVolts);
 

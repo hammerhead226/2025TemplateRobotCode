@@ -19,18 +19,25 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 
 public class FlywheelIOSim implements FlywheelIO {
-  private FlywheelSim sim = new FlywheelSim(DCMotor.getNEO(1), 1.5, 0.004);
+  private int gearBoxMotorCount = 1;
+  private double gearing = 1.5;
+  private double momentOfInertia = 0.004;
+
+  private FlywheelSim sim = new FlywheelSim(DCMotor.getNEO(gearBoxMotorCount), gearing, momentOfInertia);
   private PIDController pid = new PIDController(0.0, 0.0, 0.0);
 
   private boolean closedLoop = false;
   private double ffVolts = 0.0;
   private double appliedVolts = 0.0;
 
+  private double clampedValueLowVolts = -12.0;
+  private double clampedValueHighVolts = 12.0;
+
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
     if (closedLoop) {
       appliedVolts =
-          MathUtil.clamp(pid.calculate(sim.getAngularVelocityRadPerSec()) + ffVolts, -12.0, 12.0);
+          MathUtil.clamp(pid.calculate(sim.getAngularVelocityRadPerSec()) + ffVolts, clampedValueLowVolts, clampedValueHighVolts);
       sim.setInputVoltage(appliedVolts);
     }
 

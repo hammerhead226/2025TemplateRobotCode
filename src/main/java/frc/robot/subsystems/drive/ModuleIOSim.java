@@ -27,14 +27,24 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
  * approximation for the behavior of the module.
  */
 public class ModuleIOSim implements ModuleIO {
-  private static final double LOOP_PERIOD_SECS = 0.02;
 
-  private DCMotorSim driveSim = new DCMotorSim(DCMotor.getNEO(1), 6.75, 0.025);
-  private DCMotorSim turnSim = new DCMotorSim(DCMotor.getNEO(1), 150.0 / 7.0, 0.004);
+  private static final double LOOP_PERIOD_SECS = 0.02;
+  private int gearBoxMotorCountDrive = 1;
+  private int gearBoxMotorCountTurn = 1;
+  private double gearingDrive = 6.75;
+  private double gearingTurn = 150.0 / 7.0;
+  private double momentOfInertiaDrive = 0.025;
+  private double momentOfInertiaTurn = 0.004;
+
+  private DCMotorSim driveSim = new DCMotorSim(DCMotor.getNEO(gearBoxMotorCountDrive), gearingDrive, momentOfInertiaDrive);
+  private DCMotorSim turnSim = new DCMotorSim(DCMotor.getNEO(gearBoxMotorCountTurn), gearingTurn, momentOfInertiaTurn);
 
   private final Rotation2d turnAbsoluteInitPosition = new Rotation2d(Math.random() * 2.0 * Math.PI);
   private double driveAppliedVolts = 0.0;
   private double turnAppliedVolts = 0.0;
+
+  private double clampedValueLowVolts = -12.0;
+  private double clampedValueHighVolts = 12.0;
 
   @Override
   public void updateInputs(ModuleIOInputs inputs) {
@@ -60,13 +70,13 @@ public class ModuleIOSim implements ModuleIO {
 
   @Override
   public void setDriveVoltage(double volts) {
-    driveAppliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
+    driveAppliedVolts = MathUtil.clamp(volts, clampedValueLowVolts, clampedValueHighVolts);
     driveSim.setInputVoltage(driveAppliedVolts);
   }
 
   @Override
   public void setTurnVoltage(double volts) {
-    turnAppliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
+    turnAppliedVolts = MathUtil.clamp(volts, clampedValueLowVolts, clampedValueHighVolts);
     turnSim.setInputVoltage(turnAppliedVolts);
   }
 }

@@ -6,8 +6,8 @@ public class VisionIOLimelight implements VisionIO {
 
   String name;
 
-  public VisionIOLimelight(String name) {
-    this.name = name;
+  public VisionIOLimelight(String name, String name2) {
+
   }
 
   @Override
