@@ -1,21 +1,18 @@
 package frc.robot.subsystems.elevator;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.physicalConstants;
 import frc.robot.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
 
   private final ElevatorIO elevator;
-  private final AmpBarIO ampBar;
 
   private final ElevatorIOInputsAutoLogged eInputs = new ElevatorIOInputsAutoLogged();
-  private final AmpBarIOInputsAutoLogged aInputs = new AmpBarIOInputsAutoLogged();
 
   private static final LoggedTunableNumber kP = new LoggedTunableNumber("Elevator/kP");
   private static final LoggedTunableNumber kI = new LoggedTunableNumber("Elevator/kI");
@@ -49,13 +46,11 @@ public class Elevator extends SubsystemBase {
   private double goal;
   // private double barGoalPos;
   private final ElevatorFeedforward elevatorFFModel;
-  private final ArmFeedforward barFFmodel;
 
-  public Elevator(ElevatorIO elevator, AmpBarIO ampBar) {
+  public Elevator(ElevatorIO elevator) {
     this.elevator = elevator;
-    this.ampBar = ampBar;
 
-    switch (Constants.getMode()) {
+    switch (physicalConstants.getMode()) {
       case REAL:
         kS.initDefault(0);
         kG.initDefault(0.25);
@@ -124,18 +119,11 @@ public class Elevator extends SubsystemBase {
 
     this.elevator.configurePID(kP.get(), 0, 0);
     elevatorFFModel = new ElevatorFeedforward(kS.get(), kG.get(), kV.get(), kA.get());
-
-    this.ampBar.configurePID(barkP.get(), 0, 0);
-    barFFmodel = new ArmFeedforward(0, barkG.get(), barkV.get(), 0);
   }
 
   public boolean atGoal() {
-    return (Math.abs(eInputs.elevatorPosition - goal) <= Constants.ElevatorConstants.THRESHOLD);
-  }
-
-  public boolean barAtGoal() {
-    return (Math.abs(aInputs.barPositionDegrees - barGoal.position)
-        <= Constants.ElevatorConstants.BAR_THRESHOLD);
+    return (Math.abs(eInputs.elevatorPosition - goal)
+        <= physicalConstants.ElevatorConstants.THRESHOLD);
   }
 
   public double getElevatorPosition() {
@@ -146,48 +134,8 @@ public class Elevator extends SubsystemBase {
     return eInputs.positionSetpoint - eInputs.elevatorPosition;
   }
 
-  private double getBarError() {
-
-    return aInputs.barPositionSetpointDegrees - aInputs.barPositionDegrees;
-  }
-
-  private double getbarErrorToGoal() {
-    return barGoal.position - aInputs.barPositionDegrees;
-  }
-
   public boolean elevatorAtSetpoint() {
-    return (Math.abs(getElevatorError()) <= Constants.ElevatorConstants.THRESHOLD);
-  }
-
-  public boolean ampBarAtGoal() {
-
-    return (Math.abs(getbarErrorToGoal()) <= Constants.ElevatorConstants.BAR_THRESHOLD);
-  }
-
-  public void setBarBrakeMode(boolean bool) {
-    ampBar.setBrakeMode(bool);
-  }
-
-  public double getBarPositionRotations() {
-    return aInputs.barPositionDegrees;
-  }
-
-  public void setBarPosition(double positionDegrees, double velocityDegsPerSec) {
-
-    // positionRotations = MathUtil.clamp(positionRotations, 0, 20);
-    Logger.recordOutput("bar PositionDegrees", positionDegrees);
-    ampBar.setPositionSetpoint(positionDegrees, 0);
-    // barFFmodel.calculate(Math.toRadians(positionDegrees), Math.toRadians(velocityDegsPerSec))
-  }
-
-  public void stopAmpBar() {
-    ampBar.stop();
-  }
-
-  public void setBarGoal(double barGoalDegrees) {
-
-    barGoal = new TrapezoidProfile.State(barGoalDegrees, 0);
-    Logger.recordOutput("bar goal", barGoalDegrees);
+    return (Math.abs(getElevatorError()) <= physicalConstants.ElevatorConstants.THRESHOLD);
   }
 
   // public void setbarCurrent(double current) {
@@ -222,7 +170,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public boolean isExtended() {
-    return extenderGoal.position == Constants.ElevatorConstants.EXTEND_SETPOINT_INCH;
+    return extenderGoal.position == physicalConstants.ElevatorConstants.EXTEND_SETPOINT_INCH;
   }
 
   @Override
@@ -230,22 +178,16 @@ public class Elevator extends SubsystemBase {
     Logger.recordOutput("Alliance", DriverStation.getAlliance().isPresent());
 
     elevator.updateInputs(eInputs);
-    ampBar.updateInputs(aInputs);
 
     extenderCurrent =
-        extenderProfile.calculate(Constants.LOOP_PERIOD_SECS, extenderCurrent, extenderGoal);
+        extenderProfile.calculate(
+            physicalConstants.LOOP_PERIOD_SECS, extenderCurrent, extenderGoal);
 
-    barCurrent = barProfile.calculate(Constants.LOOP_PERIOD_SECS, barCurrent, barGoal);
+    barCurrent = barProfile.calculate(physicalConstants.LOOP_PERIOD_SECS, barCurrent, barGoal);
 
     setPositionExtend(extenderCurrent.position, extenderCurrent.velocity);
 
-    setBarPosition(barCurrent.position, barCurrent.velocity);
-
     Logger.processInputs("Elevator", eInputs);
-    Logger.processInputs("Amp bar inputs", aInputs);
-
-    Logger.recordOutput("amp bar error", getBarError());
-    Logger.recordOutput("amp bar goal", barGoal.position);
 
     Logger.recordOutput("amp bar currentPos", barCurrent.position);
     if (kP.hasChanged(hashCode()) || kI.hasChanged(hashCode())) {
@@ -253,8 +195,6 @@ public class Elevator extends SubsystemBase {
     }
     if (barkP.hasChanged(hashCode())
         || barkV.hasChanged(hashCode())
-        || barkG.hasChanged(hashCode())) {
-      ampBar.configurePID(barkP.get(), 0, 0);
-    }
+        || barkG.hasChanged(hashCode())) {}
   }
 }

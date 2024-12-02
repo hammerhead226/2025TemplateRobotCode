@@ -18,8 +18,10 @@ import static edu.wpi.first.units.Units.*;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,12 +31,13 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.CircularBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.physicalConstants;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -42,18 +45,27 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
-  private static final double MAX_LINEAR_SPEED = Units.feetToMeters(14.5);
-  private static final double TRACK_WIDTH_X = Units.inchesToMeters(25.0);
-  private static final double TRACK_WIDTH_Y = Units.inchesToMeters(25.0);
+  private static final double MAX_LINEAR_SPEED =
+      physicalConstants.SwerveConstants.MAX_LINEAR_SPEED * 0.85;
+  private static final double TRACK_WIDTH_X =
+      physicalConstants.SwerveConstants.TRACK_WIDTH_X_METERS;
+  private static final double TRACK_WIDTH_Y =
+      physicalConstants.SwerveConstants.TRACK_WIDTH_Y_METERS;
   private static final double DRIVE_BASE_RADIUS =
-      Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
-  private static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
+      physicalConstants.SwerveConstants.DRIVE_BASE_RADIUS;
+  private static final double MAX_ANGULAR_SPEED =
+      physicalConstants.SwerveConstants.MAX_ANGULAR_SPEED;
+  private static double multiplier = 1.0;
+  private static boolean toggle = false;
 
-  static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
   private final SysIdRoutine sysId;
+  public double yawVelocityRadPerSec = gyroInputs.yawVelocityRadPerSec;
+
+  private final PIDController rotationController;
+  static final Lock odometryLock = new ReentrantLock();
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private Rotation2d rawGyroRotation = new Rotation2d();
@@ -64,8 +76,26 @@ public class Drive extends SubsystemBase {
         new SwerveModulePosition(),
         new SwerveModulePosition()
       };
-  private SwerveDrivePoseEstimator poseEstimator =
+  public SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
+  TimestampedT2d lastNoteLocT2d = new TimestampedT2d(new Translation2d(0, 0), -1.);
+
+  public class TimestampedPose2d {
+    Pose2d pose;
+    double time;
+  }
+
+  public class TimestampedT2d {
+    Translation2d translation;
+    double time;
+
+    public TimestampedT2d(Translation2d translation, double time) {
+      this.translation = translation;
+      this.time = time;
+    }
+  }
+
+  CircularBuffer<TimestampedPose2d> robotPoseBuffer;
 
   public Drive(
       GyroIO gyroIO,
@@ -81,16 +111,18 @@ public class Drive extends SubsystemBase {
 
     // Start threads (no-op for each if no signals have been created)
     PhoenixOdometryThread.getInstance().start();
-    SparkMaxOdometryThread.getInstance().start();
 
-    // Configure AutoBuilder for PathPlanner
     AutoBuilder.configureHolonomic(
         this::getPose,
         this::setPose,
         () -> kinematics.toChassisSpeeds(getModuleStates()),
         this::runVelocity,
         new HolonomicPathFollowerConfig(
-            MAX_LINEAR_SPEED, DRIVE_BASE_RADIUS, new ReplanningConfig()),
+            new PIDConstants(5),
+            new PIDConstants(1.5),
+            physicalConstants.SwerveConstants.MAX_LINEAR_SPEED,
+            DRIVE_BASE_RADIUS,
+            new ReplanningConfig()),
         () ->
             DriverStation.getAlliance().isPresent()
                 && DriverStation.getAlliance().get() == Alliance.Red,
@@ -122,6 +154,12 @@ public class Drive extends SubsystemBase {
                 },
                 null,
                 this));
+
+    rotationController = new PIDController(0.1, 0, 0);
+
+    rotationController.setTolerance(5);
+    rotationController.enableContinuousInput(-180, 180);
+    robotPoseBuffer = new CircularBuffer<>(11);
   }
 
   public void periodic() {
