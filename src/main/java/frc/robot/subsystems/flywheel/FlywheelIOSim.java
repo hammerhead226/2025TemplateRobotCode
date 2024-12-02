@@ -23,7 +23,8 @@ public class FlywheelIOSim implements FlywheelIO {
   private double gearing = 1.5;
   private double momentOfInertia = 0.004;
 
-  private FlywheelSim sim = new FlywheelSim(DCMotor.getNEO(gearBoxMotorCount), gearing, momentOfInertia);
+  private FlywheelSim sim =
+      new FlywheelSim(DCMotor.getNEO(gearBoxMotorCount), gearing, momentOfInertia);
   private PIDController pid = new PIDController(0.0, 0.0, 0.0);
 
   private boolean closedLoop = false;
@@ -37,7 +38,10 @@ public class FlywheelIOSim implements FlywheelIO {
   public void updateInputs(FlywheelIOInputs inputs) {
     if (closedLoop) {
       appliedVolts =
-          MathUtil.clamp(pid.calculate(sim.getAngularVelocityRadPerSec()) + ffVolts, clampedValueLowVolts, clampedValueHighVolts);
+          MathUtil.clamp(
+              pid.calculate(sim.getAngularVelocityRadPerSec()) + ffVolts,
+              clampedValueLowVolts,
+              clampedValueHighVolts);
       sim.setInputVoltage(appliedVolts);
     }
 

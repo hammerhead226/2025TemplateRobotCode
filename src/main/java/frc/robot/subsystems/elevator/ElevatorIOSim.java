@@ -13,7 +13,7 @@ import frc.robot.physicalConstants;
 /** Add your docs here. */
 public class ElevatorIOSim implements ElevatorIO {
 
-  //SIM VARIABLES (CHANGE)
+  // SIM VARIABLES (CHANGE)
   private int gearBoxMotorCount = 2;
   private int gearing = 1;
   private double carriageMassKg = 1;
@@ -24,7 +24,16 @@ public class ElevatorIOSim implements ElevatorIO {
   private double initialPositionMeters = 0.0;
 
   private final DCMotor simGearbox = DCMotor.getFalcon500(gearBoxMotorCount);
-  private ElevatorSim sim = new ElevatorSim(simGearbox, gearing, carriageMassKg, drumRadiusMeters, minHeightMeters, maxHeightMeters, simulateGravity, initialPositionMeters);
+  private ElevatorSim sim =
+      new ElevatorSim(
+          simGearbox,
+          gearing,
+          carriageMassKg,
+          drumRadiusMeters,
+          minHeightMeters,
+          maxHeightMeters,
+          simulateGravity,
+          initialPositionMeters);
   private PIDController pid = new PIDController(0, 0, 0);
 
   private double positionInches = 0.0;
@@ -44,7 +53,9 @@ public class ElevatorIOSim implements ElevatorIO {
 
     appliedVolts +=
         MathUtil.clamp(
-            pid.calculate(sim.getPositionMeters() * metersToInches, positionSetpointInches), clampedValueLowVolts, clampedValueHighVolts);
+            pid.calculate(sim.getPositionMeters() * metersToInches, positionSetpointInches),
+            clampedValueLowVolts,
+            clampedValueHighVolts);
 
     sim.setInputVoltage(appliedVolts);
 

@@ -18,7 +18,7 @@ public interface IndexerIO {
 
   default void stop() {}
 
-  default void setVelocity(double velocityRadsPerSec, double ffVolts) {}
+  default void setPosition(double positionDegs, double ffvolts) {}
 
   default void configurePID(double kP, double kI, double kD) {}
 }

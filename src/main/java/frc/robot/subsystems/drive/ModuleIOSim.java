@@ -36,8 +36,10 @@ public class ModuleIOSim implements ModuleIO {
   private double momentOfInertiaDrive = 0.025;
   private double momentOfInertiaTurn = 0.004;
 
-  private DCMotorSim driveSim = new DCMotorSim(DCMotor.getNEO(gearBoxMotorCountDrive), gearingDrive, momentOfInertiaDrive);
-  private DCMotorSim turnSim = new DCMotorSim(DCMotor.getNEO(gearBoxMotorCountTurn), gearingTurn, momentOfInertiaTurn);
+  private DCMotorSim driveSim =
+      new DCMotorSim(DCMotor.getNEO(gearBoxMotorCountDrive), gearingDrive, momentOfInertiaDrive);
+  private DCMotorSim turnSim =
+      new DCMotorSim(DCMotor.getNEO(gearBoxMotorCountTurn), gearingTurn, momentOfInertiaTurn);
 
   private final Rotation2d turnAbsoluteInitPosition = new Rotation2d(Math.random() * 2.0 * Math.PI);
   private double driveAppliedVolts = 0.0;

@@ -14,7 +14,7 @@ import frc.robot.physicalConstants;
 /** Add your docs here. */
 public class PivotIOSim implements PivotIO {
 
-  //SIM VARIABLES
+  // SIM VARIABLES
   private int gearBoxMotorCount = 2;
   private double gearing = 5;
   private double armLength = Units.inchesToMeters(20);
@@ -25,7 +25,16 @@ public class PivotIOSim implements PivotIO {
   private double startingAngleRads = 0.0;
 
   private final DCMotor pivotGearbox = DCMotor.getFalcon500(gearBoxMotorCount);
-  private final SingleJointedArmSim sim = new SingleJointedArmSim(pivotGearbox, gearing, momentOfInertia, armLength, minAngleRadians, maxAngleRadians, simulateGravity, startingAngleRads);
+  private final SingleJointedArmSim sim =
+      new SingleJointedArmSim(
+          pivotGearbox,
+          gearing,
+          momentOfInertia,
+          armLength,
+          minAngleRadians,
+          maxAngleRadians,
+          simulateGravity,
+          startingAngleRads);
   private final PIDController pid = new PIDController(0, 0, 0);
 
   private double currentAmps = 0.0;
@@ -42,7 +51,10 @@ public class PivotIOSim implements PivotIO {
     positionSetpointRads = pid.getSetpoint();
 
     appliedVolts +=
-        MathUtil.clamp(pid.calculate(sim.getAngleRads(), positionSetpointRads), clampedValueLowVolts, clampedValueHighVolts);
+        MathUtil.clamp(
+            pid.calculate(sim.getAngleRads(), positionSetpointRads),
+            clampedValueLowVolts,
+            clampedValueHighVolts);
 
     sim.setInputVoltage(appliedVolts);
 

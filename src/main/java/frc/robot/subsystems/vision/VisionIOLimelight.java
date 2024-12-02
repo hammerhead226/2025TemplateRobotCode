@@ -6,9 +6,7 @@ public class VisionIOLimelight implements VisionIO {
 
   String name;
 
-  public VisionIOLimelight(String name, String name2) {
-
-  }
+  public VisionIOLimelight(String name, String name2) {}
 
   @Override
   public void updateInputs(VisionIOInputs inputs) {

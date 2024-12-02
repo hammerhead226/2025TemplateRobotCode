@@ -4,7 +4,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -54,17 +54,10 @@ public class IndexerIOTalonFX implements IndexerIO {
   }
 
   @Override
-  public void setVelocity(double velocityRadPerSec, double ffVolts) {
+  public void setPosition(double positionDegs, double ffVolts) {
     talon.setControl(
-        new VelocityVoltage(
-            Units.radiansToRotations(velocityRadPerSec),
-            0.0,
-            true,
-            ffVolts,
-            0,
-            false,
-            false,
-            false));
+        new PositionVoltage(
+            Units.degreesToRotations(positionDegs), 0, false, ffVolts, 0, false, false, false));
   }
 
   @Override
