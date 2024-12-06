@@ -52,7 +52,7 @@ public class Elevator extends SubsystemBase {
   public Elevator(ElevatorIO elevator) {
     this.elevator = elevator;
 
-    switch (physicalConstants.getMode()) {
+    switch (PhysicalConstants.getMode()) {
       case REAL:
       
         kS.setDefault(0);
@@ -126,7 +126,7 @@ public class Elevator extends SubsystemBase {
 
   public boolean atGoal() {
     return (Math.abs(eInputs.elevatorPosition - goal)
-        <= physicalConstants.ElevatorConstants.THRESHOLD);
+        <= PhysicalConstants.ElevatorConstants.THRESHOLD);
   }
 
   public double getElevatorPosition() {
@@ -138,7 +138,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public boolean elevatorAtSetpoint() {
-    return (Math.abs(getElevatorError()) <= physicalConstants.ElevatorConstants.THRESHOLD);
+    return (Math.abs(getElevatorError()) <= PhysicalConstants.ElevatorConstants.THRESHOLD);
   }
 
   // public void setbarCurrent(double current) {
@@ -173,7 +173,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public boolean isExtended() {
-    return extenderGoal.position == physicalConstants.ElevatorConstants.EXTEND_SETPOINT_INCH;
+    return extenderGoal.position == PhysicalConstants.ElevatorConstants.EXTEND_SETPOINT_INCH;
   }
 
   @Override
@@ -184,9 +184,9 @@ public class Elevator extends SubsystemBase {
 
     extenderCurrent =
         extenderProfile.calculate(
-            physicalConstants.LOOP_PERIOD_SECS, extenderCurrent, extenderGoal);
+            PhysicalConstants.LOOP_PERIOD_SECS, extenderCurrent, extenderGoal);
 
-    barCurrent = barProfile.calculate(physicalConstants.LOOP_PERIOD_SECS, barCurrent, barGoal);
+    barCurrent = barProfile.calculate(PhysicalConstants.LOOP_PERIOD_SECS, barCurrent, barGoal);
 
     setPositionExtend(extenderCurrent.position, extenderCurrent.velocity);
 

@@ -5,7 +5,7 @@
 package frc.robot.subsystems.indexers;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.physicalConstants;
+import frc.robot.constants.PhysicalConstants;
 
 public class Indexer extends SubsystemBase {
   /** Creates a new Indexer. */
@@ -16,7 +16,7 @@ public class Indexer extends SubsystemBase {
   public Indexer(IndexerIO indexer) {
     this.indexer = indexer;
 
-    switch (physicalConstants.currentMode) {
+    switch (PhysicalConstants.currentMode) {
       case REAL:
       case REPLAY:
         break;

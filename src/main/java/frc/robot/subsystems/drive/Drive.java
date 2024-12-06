@@ -40,7 +40,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.physicalConstants;
+import frc.robot.constants.PhysicalConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
@@ -50,15 +50,15 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
   private static final double MAX_LINEAR_SPEED =
-      physicalConstants.SwerveConstants.MAX_LINEAR_SPEED * 0.85;
+      PhysicalConstants.SwerveConstants.MAX_LINEAR_SPEED * 0.85;
   private static final double TRACK_WIDTH_X =
-      physicalConstants.SwerveConstants.TRACK_WIDTH_X_METERS;
+      PhysicalConstants.SwerveConstants.TRACK_WIDTH_X_METERS;
   private static final double TRACK_WIDTH_Y =
-      physicalConstants.SwerveConstants.TRACK_WIDTH_Y_METERS;
+      PhysicalConstants.SwerveConstants.TRACK_WIDTH_Y_METERS;
   private static final double DRIVE_BASE_RADIUS =
-      physicalConstants.SwerveConstants.DRIVE_BASE_RADIUS;
+      PhysicalConstants.SwerveConstants.DRIVE_BASE_RADIUS;
   private static final double MAX_ANGULAR_SPEED =
-      physicalConstants.SwerveConstants.MAX_ANGULAR_SPEED;
+      PhysicalConstants.SwerveConstants.MAX_ANGULAR_SPEED;
   private static double multiplier = 1.0;
   private static boolean toggle = false;
 
@@ -124,7 +124,7 @@ public class Drive extends SubsystemBase {
         new HolonomicPathFollowerConfig(
             new PIDConstants(5),
             new PIDConstants(1.5),
-            physicalConstants.SwerveConstants.MAX_LINEAR_SPEED,
+            PhysicalConstants.SwerveConstants.MAX_LINEAR_SPEED,
             DRIVE_BASE_RADIUS,
             new ReplanningConfig()),
         () ->

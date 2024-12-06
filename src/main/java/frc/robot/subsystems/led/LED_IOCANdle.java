@@ -13,9 +13,8 @@ import com.ctre.phoenix.led.FireAnimation;
 import com.ctre.phoenix.led.StrobeAnimation;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-// import edu.wpi.first.wpilibj.motorcontrol.Spark;
-import frc.robot.physicalConstants;
-import frc.robot.physicalConstants.LED_STATE;
+import frc.robot.constants.PhysicalConstants;
+import frc.robot.constants.PhysicalConstants.LED_STATE;
 
 public class LED_IOCANdle implements LED_IO {
   LED_STATE ledState;
@@ -44,7 +43,7 @@ public class LED_IOCANdle implements LED_IO {
   public LED_IOCANdle(int channel, String CANBUS) {
     // led = new Spark(channel);
     candle = new CANdle(channel, CANBUS);
-    ledState = physicalConstants.LED_STATE.BLUE;
+    ledState = PhysicalConstants.LED_STATE.BLUE;
 
     CANdleConfiguration configs = new CANdleConfiguration();
     // CANdleControlFrame.CANdle_Control_1_General(0x4000);

@@ -21,7 +21,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.CurrentUnit;
 
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import frc.robot.physicalConstants;
+import frc.robot.constants.physicalConstants;
 
 /** Add your docs here. */
 public class ElevatorIOSim implements ElevatorIO {

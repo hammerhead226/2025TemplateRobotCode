@@ -4,8 +4,9 @@
 
 package frc.robot.subsystems.led;
 
-import frc.robot.physicalConstants.LED_STATE;
 import org.littletonrobotics.junction.AutoLog;
+
+import frc.robot.constants.PhysicalConstants.LED_STATE;
 
 /** Add your docs here. */
 public interface LED_IO {

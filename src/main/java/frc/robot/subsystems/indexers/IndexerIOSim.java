@@ -4,7 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import frc.robot.physicalConstants;
+import frc.robot.constants.PhysicalConstants;
 
 public class IndexerIOSim implements IndexerIO {
 
@@ -58,7 +58,7 @@ public class IndexerIOSim implements IndexerIO {
       sim.setInputVoltage(appliedVolts);
     }
 
-    sim.update(physicalConstants.LOOP_PERIOD_SECS);
+    sim.update(PhysicalConstants.LOOP_PERIOD_SECS);
 
     inputs.positionRads = sim.getAngularPositionRad();
     inputs.velocityRadsPerSec = sim.getAngularVelocityRadPerSec();

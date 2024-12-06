@@ -8,7 +8,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.physicalConstants;
+import frc.robot.constants.PhysicalConstants;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Pivot extends SubsystemBase {
@@ -35,7 +36,7 @@ public class Pivot extends SubsystemBase {
   /** Creates a new Pivot. */
   public Pivot(PivotIO pivot) {
     this.pivot = pivot;
-    switch (physicalConstants.getMode()) {
+    switch (PhysicalConstants.getMode()) {
       case REAL:
         kG = 0.29;
         kV = 1;
@@ -117,7 +118,7 @@ public class Pivot extends SubsystemBase {
 
     pivotCurrentStateDegrees =
         pivotProfile.calculate(
-            physicalConstants.LOOP_PERIOD_SECS, pivotCurrentStateDegrees, pivotGoalStateDegrees);
+            PhysicalConstants.LOOP_PERIOD_SECS, pivotCurrentStateDegrees, pivotGoalStateDegrees);
 
     setPositionDegs(pivotCurrentStateDegrees.position, pivotCurrentStateDegrees.velocity);
 

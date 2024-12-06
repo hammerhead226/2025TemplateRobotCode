@@ -11,7 +11,7 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.physicalConstants;
+import frc.robot.constants.PhysicalConstants;
 import frc.robot.util.Conversions;
 
 public class ElevatorIOTalonFX implements ElevatorIO {
@@ -26,18 +26,18 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   public ElevatorIOTalonFX(int lead, int follow) {
     TalonFXConfiguration config = new TalonFXConfiguration();
-    config.CurrentLimits.StatorCurrentLimit = physicalConstants.ElevatorConstants.CURRENT_LIMIT;
+    config.CurrentLimits.StatorCurrentLimit = PhysicalConstants.ElevatorConstants.CURRENT_LIMIT;
     config.CurrentLimits.StatorCurrentLimitEnable =
-        physicalConstants.ElevatorConstants.CURRENT_LIMIT_ENABLED;
+        PhysicalConstants.ElevatorConstants.CURRENT_LIMIT_ENABLED;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
 
-    leader = new TalonFX(lead, physicalConstants.CANBUS);
-    follower = new TalonFX(follow, physicalConstants.CANBUS);
+    leader = new TalonFX(lead, PhysicalConstants.CANBUS);
+    follower = new TalonFX(follow, PhysicalConstants.CANBUS);
 
     leader.getConfigurator().apply(config);
 
-    positionSetpoint = physicalConstants.ElevatorConstants.RETRACT_SETPOINT_INCH;
+    positionSetpoint = PhysicalConstants.ElevatorConstants.RETRACT_SETPOINT_INCH;
 
     follower.setControl(new Follower(lead, true));
 
@@ -57,12 +57,12 @@ public class ElevatorIOTalonFX implements ElevatorIO {
         Conversions.motorRotToInches(
             elevatorPosition.getValueAsDouble(),
             5.97,
-            physicalConstants.ElevatorConstants.REDUCTION);
+            PhysicalConstants.ElevatorConstants.REDUCTION);
     inputs.elevatorVelocity =
         Conversions.motorRotToInches(
             elevatorVelocity.getValueAsDouble() * 60.,
             5.97,
-            physicalConstants.ElevatorConstants.REDUCTION);
+            PhysicalConstants.ElevatorConstants.REDUCTION);
     inputs.appliedVolts = appliedVolts.getValueAsDouble();
     inputs.currentAmps = currentAmps.getValueAsDouble();
     inputs.positionSetpoint = positionSetpoint;
@@ -79,7 +79,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     leader.setControl(
         new PositionVoltage(
             Conversions.inchesToMotorRot(
-                position, 5.97, physicalConstants.ElevatorConstants.REDUCTION),
+                position, 5.97, PhysicalConstants.ElevatorConstants.REDUCTION),
             0,
             false,
             ffVolts,

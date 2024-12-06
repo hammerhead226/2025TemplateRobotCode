@@ -11,11 +11,11 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
-package frc.robot;
+package frc.robot.constants;
 
 import edu.wpi.first.math.util.Units;
 
-public final class physicalConstants {
+public final class PhysicalConstants {
   public static final Mode currentMode = Mode.REAL;
   public static final boolean tuningMode = true;
   public static final String CANBUS = "CAN Bus 2";

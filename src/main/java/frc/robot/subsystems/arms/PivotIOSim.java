@@ -10,7 +10,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import frc.robot.physicalConstants;
+import frc.robot.constants.physicalConstants;
 
 /** Add your docs here. */
 public class PivotIOSim implements PivotIO {
