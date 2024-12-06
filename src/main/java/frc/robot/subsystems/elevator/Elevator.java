@@ -4,9 +4,11 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.physicalConstants;
-import frc.robot.util.LoggedTunableNumber;
+
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class Elevator extends SubsystemBase {
 
@@ -14,19 +16,19 @@ public class Elevator extends SubsystemBase {
 
   private final ElevatorIOInputsAutoLogged eInputs = new ElevatorIOInputsAutoLogged();
 
-  private static final LoggedTunableNumber kP = new LoggedTunableNumber("Elevator/kP");
-  private static final LoggedTunableNumber kI = new LoggedTunableNumber("Elevator/kI");
+  private static final LoggedNetworkNumber kP = new LoggedNetworkNumber("Elevator/kP");
+  private static final LoggedNetworkNumber kI = new LoggedNetworkNumber("Elevator/kI");
 
-  private static final LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS");
-  private static final LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG");
-  private static final LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV");
-  private static final LoggedTunableNumber kA = new LoggedTunableNumber("Elevator/kA");
+  private static final LoggedNetworkNumber kS = new LoggedNetworkNumber("Elevator/kS");
+  private static final LoggedNetworkNumber kG = new LoggedNetworkNumber("Elevator/kG");
+  private static final LoggedNetworkNumber kV = new LoggedNetworkNumber("Elevator/kV");
+  private static final LoggedNetworkNumber kA = new LoggedNetworkNumber("Elevator/kA");
 
   // amp bar gains
 
-  private static final LoggedTunableNumber barkP = new LoggedTunableNumber("Bar/kP");
-  private static final LoggedTunableNumber barkV = new LoggedTunableNumber("Bar/kV");
-  private static final LoggedTunableNumber barkG = new LoggedTunableNumber("Bar/kG");
+  private static final LoggedNetworkNumber barkP = new LoggedNetworkNumber("Bar/kP");
+  private static final LoggedNetworkNumber barkV = new LoggedNetworkNumber("Bar/kV");
+  private static final LoggedNetworkNumber barkG = new LoggedNetworkNumber("Bar/kG");
 
   private TrapezoidProfile extenderProfile;
   private TrapezoidProfile.Constraints extenderConstraints =
@@ -52,56 +54,57 @@ public class Elevator extends SubsystemBase {
 
     switch (physicalConstants.getMode()) {
       case REAL:
-        kS.initDefault(0);
-        kG.initDefault(0.25);
-        kV.initDefault(0);
-        kA.initDefault(0);
+      
+        kS.setDefault(0);
+        kG.setDefault(0.25);
+        kV.setDefault(0);
+        kA.setDefault(0);
 
-        kP.initDefault(0.44);
-        kI.initDefault(0);
+        kP.setDefault(0.44);
+        kI.setDefault(0);
 
-        barkP.initDefault(0.25);
-        barkV.initDefault(0.2);
-        barkG.initDefault(0);
+        barkP.setDefault(0.25);
+        barkV.setDefault(0.2);
+        barkG.setDefault(0);
         break;
       case REPLAY:
-        kS.initDefault(0);
-        kG.initDefault(0.13);
-        kV.initDefault(0);
-        kA.initDefault(0);
+        kS.setDefault(0);
+        kG.setDefault(0.13);
+        kV.setDefault(0);
+        kA.setDefault(0);
 
-        kP.initDefault(15);
-        kI.initDefault(0);
+        kP.setDefault(15);
+        kI.setDefault(0);
 
-        barkP.initDefault(0);
-        barkV.initDefault(0);
-        barkG.initDefault(0);
+        barkP.setDefault(0);
+        barkV.setDefault(0);
+        barkG.setDefault(0);
         break;
       case SIM:
-        kS.initDefault(0);
-        kG.initDefault(0.04);
-        kV.initDefault(0);
-        kA.initDefault(0);
+        kS.setDefault(0);
+        kG.setDefault(0.04);
+        kV.setDefault(0);
+        kA.setDefault(0);
 
-        kP.initDefault(1);
-        kI.initDefault(0);
+        kP.setDefault(1);
+        kI.setDefault(0);
 
-        barkP.initDefault(0);
-        barkV.initDefault(0);
-        barkG.initDefault(0);
+        barkP.setDefault(0);
+        barkV.setDefault(0);
+        barkG.setDefault(0);
         break;
       default:
-        kS.initDefault(0);
-        kG.initDefault(0.13);
-        kV.initDefault(0);
-        kA.initDefault(0);
+        kS.setDefault(0);
+        kG.setDefault(0.13);
+        kV.setDefault(0);
+        kA.setDefault(0);
 
-        kP.initDefault(15);
-        kI.initDefault(0);
+        kP.setDefault(15);
+        kI.setDefault(0);
 
-        barkP.initDefault(0);
-        barkV.initDefault(0);
-        barkG.initDefault(0);
+        barkP.setDefault(0);
+        barkV.setDefault(0);
+        barkG.setDefault(0);
         break;
     }
 
@@ -149,7 +152,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public void setPositionExtend(double position, double velocity) {
-    elevator.setPositionSetpoint(position, elevatorFFModel.calculate(velocity));
+    elevator.setPositionSetpoint(position, elevatorFFModel.calculate(MetersPerSecond.of(velocity)));
   }
 
   public void elevatorStop() {
@@ -190,11 +193,13 @@ public class Elevator extends SubsystemBase {
     Logger.processInputs("Elevator", eInputs);
 
     Logger.recordOutput("amp bar currentPos", barCurrent.position);
-    if (kP.hasChanged(hashCode()) || kI.hasChanged(hashCode())) {
-      elevator.configurePID(kP.get(), kI.get(), 0);
-    }
-    if (barkP.hasChanged(hashCode())
-        || barkV.hasChanged(hashCode())
-        || barkG.hasChanged(hashCode())) {}
-  }
+   // if (kP.hasChanged(hashCode()) || kI.hasChanged(hashCode())) {
+    // elevator.configurePID(kP.get(), kI.get(), 0);
+  // }
+   // if (barkP.hasChanged(hashCode())
+   //     || barkV.hasChanged(hashCode())
+  //      || barkG.hasChanged(hashCode())) {}
+ // }
+
+ }
 }

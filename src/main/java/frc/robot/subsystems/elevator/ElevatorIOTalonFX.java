@@ -9,6 +9,8 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.units.measure.Voltage;
 import frc.robot.physicalConstants;
 import frc.robot.util.Conversions;
 
@@ -72,7 +74,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   }
 
   @Override
-  public void setPositionSetpoint(double position, double ffVolts) {
+  public void setPositionSetpoint(double position, Voltage ffVolts) {
     this.positionSetpoint = position;
     leader.setControl(
         new PositionVoltage(
