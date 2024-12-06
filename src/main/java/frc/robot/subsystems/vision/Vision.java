@@ -1,165 +1,188 @@
+// Copyright 2021-2024 FRC 6328
+// http://github.com/Mechanical-Advantage
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// version 3 as published by the Free Software Foundation or
+// available in the root directory of this project.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+
 package frc.robot.subsystems.vision;
 
+import static frc.robot.subsystems.vision.VisionConstants.*;
+
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotContainer;
-import frc.robot.physicalConstants;
-import frc.robot.util.LimelightHelpers;
-import frc.robot.util.LimelightHelpers.PoseEstimate;
-import frc.robot.util.LimelightHelpers.RawFiducial;
+import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
+import java.util.LinkedList;
+import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
-  private static double multiplier = 1.0;
-  private static boolean toggle = false;
+  private final VisionConsumer consumer;
+  private final VisionIO[] io;
+  private final VisionIOInputsAutoLogged[] inputs;
+  private final Alert[] disconnectedAlerts;
 
-  private boolean overridePathplanner = false;
+  public Vision(VisionConsumer consumer, VisionIO... io) {
+    this.consumer = consumer;
+    this.io = io;
 
-  // private NetworkTable limelightintake =
-  //   NetworkTableInstance.getDefault().getTable(physicalConstants.LL_INTAKE);
+    // Initialize inputs
+    this.inputs = new VisionIOInputsAutoLogged[io.length];
+    for (int i = 0; i < inputs.length; i++) {
+      inputs[i] = new VisionIOInputsAutoLogged();
+    }
 
-  private final VisionIO visionIO;
-  private final VisionIOInputsAutoLogged visionInputs = new VisionIOInputsAutoLogged();
+    // Initialize disconnected alerts
+    this.disconnectedAlerts = new Alert[io.length];
+    for (int i = 0; i < inputs.length; i++) {
+      disconnectedAlerts[i] =
+          new Alert(
+              "Vision camera " + Integer.toString(i) + " is disconnected.", AlertType.kWarning);
+    }
+  }
 
-  public Vision(VisionIO visionIO) {
-    this.visionIO = visionIO;
+  /**
+   * Returns the X angle to the best target, which can be used for simple servoing with vision.
+   *
+   * @param cameraIndex The index of the camera to use.
+   */
+  public Rotation2d getTargetX(int cameraIndex) {
+    return inputs[cameraIndex].latestTargetObservation.tx();
   }
 
   @Override
   public void periodic() {
-    visionIO.updateInputs(visionInputs);
-    LimelightHelpers.SetRobotOrientation(
-        physicalConstants.LL_ALIGN,
-        RobotContainer.drive.poseEstimator.getEstimatedPosition().getRotation().getDegrees(),
-        0,
-        0,
-        0,
-        0,
-        0);
+    for (int i = 0; i < io.length; i++) {
+      io[i].updateInputs(inputs[i]);
+      Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
+    }
 
-    if (DriverStation.getAlliance().isPresent() && visionInputs.aTV) {
-      Logger.recordOutput(
-          "tags > 1 or disabled ", visionInputs.tagCount > 1 || DriverStation.isDisabled());
+    // Initialize logging values
+    List<Pose3d> allTagPoses = new LinkedList<>();
+    List<Pose3d> allRobotPoses = new LinkedList<>();
+    List<Pose3d> allRobotPosesAccepted = new LinkedList<>();
+    List<Pose3d> allRobotPosesRejected = new LinkedList<>();
 
-      if (visionInputs.tagCount > 1 || DriverStation.isDisabled()) {
-        visionLogic();
-      } else {
-        // mt2TagFiltering();
-        visionLogic();
+    // Loop over cameras
+    for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
+      // Update disconnected alert
+      disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
+
+      // Initialize logging values
+      List<Pose3d> tagPoses = new LinkedList<>();
+      List<Pose3d> robotPoses = new LinkedList<>();
+      List<Pose3d> robotPosesAccepted = new LinkedList<>();
+      List<Pose3d> robotPosesRejected = new LinkedList<>();
+
+      // Add tag poses
+      for (int tagId : inputs[cameraIndex].tagIds) {
+        var tagPose = aprilTagLayout.getTagPose(tagId);
+        if (tagPose.isPresent()) {
+          tagPoses.add(tagPose.get());
+        }
       }
+
+      // Loop over pose observations
+      for (var observation : inputs[cameraIndex].poseObservations) {
+        // Check whether to reject pose
+        boolean rejectPose =
+            observation.tagCount() == 0 // Must have at least one tag
+                || (observation.tagCount() == 1
+                    && observation.ambiguity() > maxAmbiguity) // Cannot be high ambiguity
+                || Math.abs(observation.pose().getZ())
+                    > maxZError // Must have realistic Z coordinate
+
+                // Must be within the field boundaries
+                || observation.pose().getX() < 0.0
+                || observation.pose().getX() > aprilTagLayout.getFieldLength()
+                || observation.pose().getY() < 0.0
+                || observation.pose().getY() > aprilTagLayout.getFieldWidth();
+
+        // Add pose to log
+        robotPoses.add(observation.pose());
+        if (rejectPose) {
+          robotPosesRejected.add(observation.pose());
+        } else {
+          robotPosesAccepted.add(observation.pose());
+        }
+
+        // Skip if rejected
+        if (rejectPose) {
+          continue;
+        }
+
+        // Calculate standard deviations
+        double stdDevFactor =
+            Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
+        double linearStdDev = linearStdDevBaseline * stdDevFactor;
+        double angularStdDev = angularStdDevBaseline * stdDevFactor;
+        if (observation.type() == PoseObservationType.MEGATAG_2) {
+          linearStdDev *= linearStdDevMegatag2Factor;
+          angularStdDev *= angularStdDevMegatag2Factor;
+        }
+        if (cameraIndex < cameraStdDevFactors.length) {
+          linearStdDev *= cameraStdDevFactors[cameraIndex];
+          angularStdDev *= cameraStdDevFactors[cameraIndex];
+        }
+
+        // Send vision observation
+        consumer.accept(
+            observation.pose().toPose2d(),
+            observation.timestamp(),
+            VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+      }
+
+      // Log camera datadata
+      Logger.recordOutput(
+          "Vision/Camera" + Integer.toString(cameraIndex) + "/TagPoses",
+          tagPoses.toArray(new Pose3d[tagPoses.size()]));
+      Logger.recordOutput(
+          "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPoses",
+          robotPoses.toArray(new Pose3d[robotPoses.size()]));
+      Logger.recordOutput(
+          "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesAccepted",
+          robotPosesAccepted.toArray(new Pose3d[robotPosesAccepted.size()]));
+      Logger.recordOutput(
+          "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesRejected",
+          robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
+      allTagPoses.addAll(tagPoses);
+      allRobotPoses.addAll(robotPoses);
+      allRobotPosesAccepted.addAll(robotPosesAccepted);
+      allRobotPosesRejected.addAll(robotPosesRejected);
     }
+
+    // Log summary data
+    Logger.recordOutput(
+        "Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[allTagPoses.size()]));
+    Logger.recordOutput(
+        "Vision/Summary/RobotPoses", allRobotPoses.toArray(new Pose3d[allRobotPoses.size()]));
+    Logger.recordOutput(
+        "Vision/Summary/RobotPosesAccepted",
+        allRobotPosesAccepted.toArray(new Pose3d[allRobotPosesAccepted.size()]));
+    Logger.recordOutput(
+        "Vision/Summary/RobotPosesRejected",
+        allRobotPosesRejected.toArray(new Pose3d[allRobotPosesRejected.size()]));
   }
 
-  public void mt2TagFiltering() {
-    boolean doRejectUpdate = false;
-
-    LimelightHelpers.PoseEstimate mt2 =
-        new PoseEstimate(
-            visionInputs.mt2VisionPose,
-            visionInputs.timestampSeconds,
-            visionInputs.latency,
-            visionInputs.tagCount,
-            visionInputs.tagSpan,
-            visionInputs.avgTagDist,
-            visionInputs.avgTagArea,
-            new RawFiducial[] {});
-    if (Math.abs(RobotContainer.drive.yawVelocityRadPerSec) > Math.toRadians(360)) {
-      doRejectUpdate = true;
-    }
-
-    if (mt2.tagCount == 0) {
-      doRejectUpdate = true;
-    }
-
-    if (mt2.pose.getTranslation().getDistance(new Translation2d(7.9, 4.1)) < 0.4) {
-      doRejectUpdate = true;
-    }
-
-    if (!doRejectUpdate) {
-      RobotContainer.drive.poseEstimator.setVisionMeasurementStdDevs(
-          VecBuilder.fill(0.7, 0.7, Units.degreesToRadians(9999999)));
-      RobotContainer.drive.poseEstimator.addVisionMeasurement(
-          mt2.pose, mt2.timestampSeconds - (mt2.latency / 1000.));
-    }
-
-    Logger.recordOutput("Vision Measurement", mt2.pose);
-    Logger.recordOutput("Rejecting Tags", doRejectUpdate);
-  }
-
-  public void visionLogic() {
-    LimelightHelpers.PoseEstimate limelightMeasurement =
-        new PoseEstimate(
-            visionInputs.mt1VisionPose,
-            visionInputs.timestampSeconds,
-            visionInputs.latency,
-            visionInputs.tagCount,
-            visionInputs.tagSpan,
-            visionInputs.avgTagDist,
-            visionInputs.avgTagArea,
-            new RawFiducial[] {});
-
-    double xMeterStds;
-    double yMeterStds;
-    double headingDegStds;
-
-    double poseDifference = getVisionPoseDifference(limelightMeasurement.pose);
-
-    boolean isFlipped =
-        DriverStation.getAlliance().isPresent()
-            && DriverStation.getAlliance().get() == Alliance.Red;
-
-    Logger.recordOutput("avg area", limelightMeasurement.avgTagArea);
-
-    if (limelightMeasurement.tagCount >= 2 && limelightMeasurement.avgTagArea > 0.04) {
-      xMeterStds = 0.7;
-      yMeterStds = 0.7;
-      headingDegStds = 8;
-    } else if (limelightMeasurement.tagCount == 1
-        && poseDifference < 0.5) { // && poseDifference < 0.5
-      xMeterStds = 5;
-      yMeterStds = 5;
-      headingDegStds = 30;
-    } else if (limelightMeasurement.tagCount == 1 && poseDifference < 3) { // && poseDifference < 3
-      xMeterStds = 11.43;
-      yMeterStds = 11.43;
-      headingDegStds = 9999;
-    } else return;
-
-    Logger.recordOutput("number of tags", limelightMeasurement.tagCount);
-
-    RobotContainer.drive.poseEstimator.setVisionMeasurementStdDevs(
-        VecBuilder.fill(xMeterStds, yMeterStds, Units.degreesToRadians(headingDegStds)));
-
-    Pose2d pose = limelightMeasurement.pose;
-
-    if (isFlipped) {
-      pose.getRotation().plus(new Rotation2d(Math.PI));
-    }
-
-    Logger.recordOutput("Vision Measurement", limelightMeasurement.pose);
-  }
-
-  public double getVisionPoseDifference(Pose2d visionPose) {
-    return RobotContainer.drive.getPose().getTranslation().getDistance(visionPose.getTranslation());
-  }
-
-  public boolean acceptableMeasurements(Pose2d visionMeasurement) {
-    return Math.abs(visionMeasurement.getX() - RobotContainer.drive.getPose().getX()) < 1
-        && Math.abs(visionMeasurement.getY() - RobotContainer.drive.getPose().getY()) < 1;
-  }
-
-  public boolean canCorrect(Pose2d visionMeasurement, double timeSinceLastCorrection) {
-    if (timeSinceLastCorrection < 5) {
-      if (acceptableMeasurements(visionMeasurement)) return true;
-    } else {
-      return true;
-    }
-    return false;
+  @FunctionalInterface
+  public static interface VisionConsumer {
+    public void accept(
+        Pose2d visionRobotPoseMeters,
+        double timestampSeconds,
+        Matrix<N3, N1> visionMeasurementStdDevs);
   }
 }
