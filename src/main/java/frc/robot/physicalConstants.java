@@ -40,40 +40,40 @@ public final class physicalConstants {
   }
 
   public static class ModuleConstants {
-    public static final double WHEEL_RADIUS_METERS = Units.inchesToMeters(3.9 / 2.);
+    // public static final double WHEEL_RADIUS_METERS = Units.inchesToMeters(3.9 / 2.);
 
     public static final double DRIVE_GEAR_RATIO = 6.12;
     public static final double TURN_GEAR_RATIO = 150.0 / 7.0;
 
-    public static final double DRIVE_STATOR_CURRENT_LIMIT = 75.0;
-    public static final boolean DRIVE_STATOR_CURRENT_LIMIT_ENABLED = true;
-    public static final double DRIVE_SUPPLY_CURRENT_LIMIT = 42.0;
-    public static final boolean DRIVE_SUPPLY_CURRENT_LIMIT_ENABLED = true;
+    // public static final double DRIVE_STATOR_CURRENT_LIMIT = 75.0;
+    // public static final boolean DRIVE_STATOR_CURRENT_LIMIT_ENABLED = true;
+    // public static final double DRIVE_SUPPLY_CURRENT_LIMIT = 42.0;
+    // public static final boolean DRIVE_SUPPLY_CURRENT_LIMIT_ENABLED = true;
 
-    public static final double TURN_STATOR_CURRENT_LIMIT = 30.0;
-    public static final boolean TURN_STATOR_CURRENT_LIMIT_ENABLED = true;
-    public static final double TURN_SUPPLY_CURRENT_LIMIT = 30.0;
-    public static final boolean TURN_SUPPLY_CURRENT_LIMIT_ENABLED = true;
+    // public static final double TURN_STATOR_CURRENT_LIMIT = 30.0;
+    // public static final boolean TURN_STATOR_CURRENT_LIMIT_ENABLED = true;
+    // public static final double TURN_SUPPLY_CURRENT_LIMIT = 30.0;
+    // public static final boolean TURN_SUPPLY_CURRENT_LIMIT_ENABLED = true;
   }
 
   public static class IntakeConstants {
     public static final int CURRENT_LIMIT = 40;
-    public static final int APPLIED_VOLTAGE = 12;
+    // public static final int APPLIED_VOLTAGE = 12;
     public static final boolean CURRENT_LIMIT_ENABLED = true;
   }
 
   public static final class shooterConstants {
-    public static final double FEEDER_CURRENT_LIMIT = 40;
-    public static final boolean FEEDER_CURRENT_LIMIT_ENABLED = true;
+    // public static final double FEEDER_CURRENT_LIMIT = 40;
+    // public static final boolean FEEDER_CURRENT_LIMIT_ENABLED = true;
 
-    public static final double FEEDER_THRESHOLD = 0;
-    public static final double FEEDER_DIST = 1300;
+    // public static final double FEEDER_THRESHOLD = 0;
+    // public static final double FEEDER_DIST = 1300;
 
-    public static final double FLYWHEEL_CURRENT_LIMIT = 40;
-    public static final boolean FLYWHEEL_CURRENT_LIMIT_ENABLED = true;
+    // public static final double FLYWHEEL_CURRENT_LIMIT = 40;
+    // public static final boolean FLYWHEEL_CURRENT_LIMIT_ENABLED = true;
 
-    public static final double FLYWHEEL_THRESHOLD = 200;
-    public static final double FLYWHEEL_SHOOT_RPM = 3000;
+    // public static final double FLYWHEEL_THRESHOLD = 200;
+    // public static final double FLYWHEEL_SHOOT_RPM = 3000;
   }
 
   public static class ElevatorConstants {
@@ -87,7 +87,7 @@ public final class physicalConstants {
     public static final double[] PID = {0, 0, 0};
 
     public static final double REDUCTION = (25.0 / 1.0);
-    public static final double BAR_THRESHOLD = 3;
+    // public static final double BAR_THRESHOLD = 3;
   }
 
   public static final class PivotConstants {
@@ -99,7 +99,7 @@ public final class physicalConstants {
     public static final double REDUCTION =
         (15.0 / 1.0) * (34.0 / 24.0) * (24.0 / 18.0) * (50.0 / 14.0);
     public static final double STOW_SETPOINT_DEG = 50.7;
-    public static final double INTAKE_SETPOINT_DEG = 59.0;
+    // public static final double INTAKE_SETPOINT_DEG = 59.0;
 
     public static final double PIVOT_ZERO_ANGLE = 59;
   }
