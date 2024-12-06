@@ -45,8 +45,7 @@ public final class physicalConstants {
     public static final boolean CURRENT_LIMIT_ENABLED = true;
   }
 
-  public static final class shooterConstants {
-  }
+  public static final class shooterConstants {}
 
   public static class ElevatorConstants {
     public static final double CURRENT_LIMIT = 40.0;
@@ -70,7 +69,7 @@ public final class physicalConstants {
     public static final double REDUCTION =
         (15.0 / 1.0) * (34.0 / 24.0) * (24.0 / 18.0) * (50.0 / 14.0);
     public static final double STOW_SETPOINT_DEG = 50.7;
-    
+
     public static final double PIVOT_ZERO_ANGLE = 59;
   }
 
