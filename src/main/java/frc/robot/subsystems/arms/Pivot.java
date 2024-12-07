@@ -4,12 +4,18 @@
 
 package frc.robot.subsystems.arms;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.PhysicalConstants;
-
+import frc.robot.constants.SimConstants;
+import frc.robot.constants.SubsystemConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class Pivot extends SubsystemBase {
@@ -36,7 +42,7 @@ public class Pivot extends SubsystemBase {
   /** Creates a new Pivot. */
   public Pivot(PivotIO pivot) {
     this.pivot = pivot;
-    switch (PhysicalConstants.getMode()) {
+    switch (SimConstants.currentMode) {
       case REAL:
         kG = 0.29;
         kV = 1;
@@ -96,7 +102,11 @@ public class Pivot extends SubsystemBase {
     positionDegs = MathUtil.clamp(positionDegs, 33, 120);
     pivot.setPositionSetpointDegs(
         positionDegs,
-        pivotFFModel.calculate(Math.toRadians(positionDegs), Math.toRadians(velocityDegsPerSec)));
+        pivotFFModel
+            .calculate(
+                Angle.ofBaseUnits(positionDegs, Degrees),
+                AngularVelocity.ofBaseUnits(velocityDegsPerSec, DegreesPerSecond))
+            .in(Volts));
   }
 
   public void pivotStop() {
@@ -118,7 +128,9 @@ public class Pivot extends SubsystemBase {
 
     pivotCurrentStateDegrees =
         pivotProfile.calculate(
-            PhysicalConstants.LOOP_PERIOD_SECS, pivotCurrentStateDegrees, pivotGoalStateDegrees);
+            SubsystemConstants.LOOP_PERIOD_SECONDS,
+            pivotCurrentStateDegrees,
+            pivotGoalStateDegrees);
 
     setPositionDegs(pivotCurrentStateDegrees.position, pivotCurrentStateDegrees.velocity);
 

@@ -2,8 +2,6 @@ package frc.robot.subsystems.elevator;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import edu.wpi.first.units.measure.Voltage;
-
 public interface ElevatorIO {
   @AutoLog
   public static class ElevatorIOInputs {
@@ -18,7 +16,7 @@ public interface ElevatorIO {
 
   public default void runCharacterization(double volts) {}
 
-  public default void setPositionSetpoint(double position, Voltage ffVolts) {}
+  public default void setPositionSetpoint(double position, double ffVolts) {}
 
   public default void stop() {}
 

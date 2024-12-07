@@ -4,16 +4,22 @@
 
 package frc.robot.subsystems.indexers;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
+import static edu.wpi.first.units.Units.InchesPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.PhysicalConstants;
+import frc.robot.constants.SimConstants;
+import frc.robot.constants.SubsystemConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class Indexer extends SubsystemBase {
   /** Creates a new Indexer. */
   private final IndexerIO indexer;
 
-  private final IndexerIOInputsAutoLogged Iinputs = new IndexerIOInputsAutoLogged();
+  private final IndexerIOInputsAutoLogged iInputs = new IndexerIOInputsAutoLogged();
 
   private static double kP;
   private static double kG;
@@ -28,10 +34,12 @@ public class Indexer extends SubsystemBase {
   private TrapezoidProfile.State indexerGoalStateRotations = new TrapezoidProfile.State();
   private TrapezoidProfile.State indexerCurrentStateRotations = new TrapezoidProfile.State();
 
+  private ElevatorFeedforward ff;
+
   public Indexer(IndexerIO indexer) {
     this.indexer = indexer;
 
-    switch (PhysicalConstants.getMode()) {
+    switch (SimConstants.currentMode) {
       case REAL:
         kG = 0.29;
         kV = 1;
@@ -57,23 +65,40 @@ public class Indexer extends SubsystemBase {
     maxVelocityRotPerSec = 4;
     maxAccelerationRotPerSecSquared = 4;
 
-    indexerConstraints = new TrapezoidProfile.Constraints(maxVelocityRotPerSec, maxAccelerationRotPerSecSquared);
+    indexerConstraints =
+        new TrapezoidProfile.Constraints(maxVelocityRotPerSec, maxAccelerationRotPerSecSquared);
     indexerProfile = new TrapezoidProfile(indexerConstraints);
-    
-    indexerCurrentStateRotations = indexerProfile.calculate(0, indexerCurrentStateRotations, indexerGoalStateRotations);
-    
+
+    indexerCurrentStateRotations =
+        indexerProfile.calculate(0, indexerCurrentStateRotations, indexerGoalStateRotations);
+
     indexer.configurePID(kP, 0, 0);
+    ff = new ElevatorFeedforward(0, kG, kV);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    indexer.updateInputs(Iinputs);
+    indexer.updateInputs(iInputs);
+
+    indexerCurrentStateRotations =
+        indexerProfile.calculate(
+            SubsystemConstants.LOOP_PERIOD_SECONDS,
+            indexerCurrentStateRotations,
+            indexerGoalStateRotations);
+
+    indexer.setPositionSetpoint(
+        indexerCurrentStateRotations.position * 360,
+        ff.calculate(
+                LinearVelocity.ofBaseUnits(indexerCurrentStateRotations.velocity, InchesPerSecond))
+            .in(Volts));
+
+    Logger.processInputs("Indexer", iInputs);
   }
 
   public void index(double linearDistanceInches) {
 
-    indexer.setPosition(positionRots, ffvolts);
+    double rollerDiameterInches = 1;
+    indexerGoalStateRotations.position += linearDistanceInches / (rollerDiameterInches * Math.PI);
   }
-
 }

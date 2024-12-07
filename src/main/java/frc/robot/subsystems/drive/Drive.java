@@ -46,14 +46,10 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-<<<<<<< Updated upstream
-import frc.robot.constants.PhysicalConstants;
-import frc.robot.subsystems.vision.VisionIO;
-=======
-import frc.robot.Constants;
-import frc.robot.Constants.Mode;
-import frc.robot.generated.TunerConstants;
->>>>>>> Stashed changes
+import frc.robot.constants.SimConstants;
+import frc.robot.constants.SimConstants.Mode;
+import frc.robot.constants.SubsystemConstants;
+import frc.robot.constants.TunerConstants;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -61,20 +57,6 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
-<<<<<<< Updated upstream
-  private static final double MAX_LINEAR_SPEED =
-      PhysicalConstants.SwerveConstants.MAX_LINEAR_SPEED * 0.85;
-  private static final double TRACK_WIDTH_X =
-      PhysicalConstants.SwerveConstants.TRACK_WIDTH_X_METERS;
-  private static final double TRACK_WIDTH_Y =
-      PhysicalConstants.SwerveConstants.TRACK_WIDTH_Y_METERS;
-  private static final double DRIVE_BASE_RADIUS =
-      PhysicalConstants.SwerveConstants.DRIVE_BASE_RADIUS;
-  private static final double MAX_ANGULAR_SPEED =
-      PhysicalConstants.SwerveConstants.MAX_ANGULAR_SPEED;
-  private static double multiplier = 1.0;
-  private static boolean toggle = false;
-=======
   // TunerConstants doesn't include these constants, so they are declared locally
   static final double ODOMETRY_FREQUENCY =
       new CANBus(TunerConstants.DrivetrainConstants.CANBusName).isNetworkFD() ? 250.0 : 100.0;
@@ -86,7 +68,6 @@ public class Drive extends SubsystemBase {
           Math.max(
               Math.hypot(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
               Math.hypot(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)));
->>>>>>> Stashed changes
 
   // PathPlanner config constants
   private static final double ROBOT_MASS_KG = 74.088;
@@ -150,22 +131,10 @@ public class Drive extends SubsystemBase {
         this::setPose,
         this::getChassisSpeeds,
         this::runVelocity,
-<<<<<<< Updated upstream
-        new HolonomicPathFollowerConfig(
-            new PIDConstants(5),
-            new PIDConstants(1.5),
-            PhysicalConstants.SwerveConstants.MAX_LINEAR_SPEED,
-            DRIVE_BASE_RADIUS,
-            new ReplanningConfig()),
-        () ->
-            DriverStation.getAlliance().isPresent()
-                && DriverStation.getAlliance().get() == Alliance.Red,
-=======
         new PPHolonomicDriveController(
             new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
         PP_CONFIG,
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
->>>>>>> Stashed changes
         this);
     Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback(
@@ -246,7 +215,7 @@ public class Drive extends SubsystemBase {
     }
 
     // Update gyro alert
-    gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
+    gyroDisconnectedAlert.set(!gyroInputs.connected && SimConstants.currentMode != Mode.SIM);
   }
 
   /**
@@ -256,7 +225,7 @@ public class Drive extends SubsystemBase {
    */
   public void runVelocity(ChassisSpeeds speeds) {
     // Calculate module setpoints
-    speeds.discretize(0.02);
+    speeds.discretize(SubsystemConstants.LOOP_PERIOD_SECONDS);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(speeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, TunerConstants.kSpeedAt12Volts);
 
@@ -397,5 +366,4 @@ public class Drive extends SubsystemBase {
       new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
     };
   }
-  
 }

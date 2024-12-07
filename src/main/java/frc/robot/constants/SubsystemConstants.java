@@ -11,34 +11,14 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
+// does not include swerve constants
+
 package frc.robot.constants;
 
-import edu.wpi.first.math.util.Units;
+public final class SubsystemConstants {
 
-public final class PhysicalConstants {
-  public static final Mode currentMode = Mode.REAL;
-  public static final boolean tuningMode = true;
   public static final String CANBUS = "CAN Bus 2";
-  public static final double LOOP_PERIOD_SECS = 0.02;
-
-  public static final String LL_ALIGN = "limelight-align";
-  public static final double INTAKE_LL_ANGLE = -20;
-  public static final double INTAKE_LL_HEIGHT_METERS = 0.5;
-
-  public static class SwerveConstants {
-    public static final double MAX_LINEAR_SPEED = 5.56;
-    public static final double TRACK_WIDTH_X_METERS = Units.inchesToMeters(26.0);
-    public static final double TRACK_WIDTH_Y_METERS = Units.inchesToMeters(26.0);
-    public static final double DRIVE_BASE_RADIUS =
-        Math.hypot(TRACK_WIDTH_X_METERS / 2.0, TRACK_WIDTH_Y_METERS / 2.0);
-    public static final double MAX_ANGULAR_SPEED = 0.45 * MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
-    public static final double OPEN_LOOP_RAMP_SEC = 0.05;
-  }
-
-  public static class ModuleConstants {
-    public static final double DRIVE_GEAR_RATIO = 6.12;
-    public static final double TURN_GEAR_RATIO = 150.0 / 7.0;
-  }
+  public static final double LOOP_PERIOD_SECONDS = 0.02;
 
   public static class IntakeConstants {
     public static final int CURRENT_LIMIT = 40;
@@ -103,13 +83,5 @@ public final class PhysicalConstants {
     REAL,
     SIM,
     REPLAY
-  }
-
-  public static Mode getMode() {
-    return switch (currentMode) {
-      case REAL -> Mode.REAL;
-      case SIM -> Mode.SIM;
-      case REPLAY -> Mode.REPLAY;
-    };
   }
 }

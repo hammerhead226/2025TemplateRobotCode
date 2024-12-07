@@ -1,13 +1,15 @@
 package frc.robot.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.InchesPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.physicalConstants;
-
-import static edu.wpi.first.units.Units.MetersPerSecond;
-
+import frc.robot.constants.SimConstants;
+import frc.robot.constants.SubsystemConstants;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -25,7 +27,6 @@ public class Elevator extends SubsystemBase {
   private static final LoggedNetworkNumber kV = new LoggedNetworkNumber("Elevator/kV");
   private static final LoggedNetworkNumber kA = new LoggedNetworkNumber("Elevator/kA");
 
-
   private static final LoggedNetworkNumber barkG = new LoggedNetworkNumber("Bar/kG");
 
   private TrapezoidProfile extenderProfile;
@@ -34,10 +35,6 @@ public class Elevator extends SubsystemBase {
   private TrapezoidProfile.State extenderGoal = new TrapezoidProfile.State();
   private TrapezoidProfile.State extenderCurrent = new TrapezoidProfile.State();
 
-  private static double maxVelocityDegPerSec;
-  private static double maxAccelerationDegPerSecSquared;
-
- 
   private double goal;
   // private double barGoalPos;
   private final ElevatorFeedforward elevatorFFModel;
@@ -45,9 +42,8 @@ public class Elevator extends SubsystemBase {
   public Elevator(ElevatorIO elevator) {
     this.elevator = elevator;
 
-    switch (PhysicalConstants.getMode()) {
+    switch (SimConstants.currentMode) {
       case REAL:
-      
         kS.setDefault(0);
         kG.setDefault(0.25);
         kV.setDefault(0);
@@ -56,7 +52,6 @@ public class Elevator extends SubsystemBase {
         kP.setDefault(0.44);
         kI.setDefault(0);
 
-      
         barkG.setDefault(0);
         break;
       case REPLAY:
@@ -68,7 +63,6 @@ public class Elevator extends SubsystemBase {
         kP.setDefault(15);
         kI.setDefault(0);
 
-       
         barkG.setDefault(0);
         break;
       case SIM:
@@ -80,7 +74,6 @@ public class Elevator extends SubsystemBase {
         kP.setDefault(1);
         kI.setDefault(0);
 
-        
         barkG.setDefault(0);
         break;
       default:
@@ -92,7 +85,6 @@ public class Elevator extends SubsystemBase {
         kP.setDefault(15);
         kI.setDefault(0);
 
-        
         barkG.setDefault(0);
         break;
     }
@@ -101,23 +93,13 @@ public class Elevator extends SubsystemBase {
     extenderProfile = new TrapezoidProfile(extenderConstraints);
     extenderCurrent = extenderProfile.calculate(0, extenderCurrent, extenderGoal);
 
-    maxVelocityDegPerSec = 1200;
-    maxAccelerationDegPerSecSquared = 1550;
-
-    
-
     this.elevator.configurePID(kP.get(), 0, 0);
     elevatorFFModel = new ElevatorFeedforward(kS.get(), kG.get(), kV.get(), kA.get());
   }
 
   public boolean atGoal() {
-<<<<<<< Updated upstream
-    return (Math.abs(eInputs.elevatorPosition - goal)
-        <= PhysicalConstants.ElevatorConstants.THRESHOLD);
-=======
     return (Math.abs(eInputs.elevatorPositionInch - goal)
-        <= physicalConstants.ElevatorConstants.THRESHOLD);
->>>>>>> Stashed changes
+        <= SubsystemConstants.ElevatorConstants.THRESHOLD);
   }
 
   public double getElevatorPosition() {
@@ -129,7 +111,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public boolean elevatorAtSetpoint() {
-    return (Math.abs(getElevatorError()) <= PhysicalConstants.ElevatorConstants.THRESHOLD);
+    return (Math.abs(getElevatorError()) <= SubsystemConstants.ElevatorConstants.THRESHOLD);
   }
 
   // public void setbarCurrent(double current) {
@@ -143,7 +125,9 @@ public class Elevator extends SubsystemBase {
   }
 
   public void setPositionExtend(double position, double velocity) {
-    elevator.setPositionSetpoint(position, elevatorFFModel.calculate(MetersPerSecond.of(velocity)));
+    elevator.setPositionSetpoint(
+        position,
+        elevatorFFModel.calculate(LinearVelocity.ofBaseUnits(velocity, InchesPerSecond)).in(Volts));
   }
 
   public void elevatorStop() {
@@ -164,7 +148,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public boolean isExtended() {
-    return extenderGoal.position == PhysicalConstants.ElevatorConstants.EXTEND_SETPOINT_INCH;
+    return extenderGoal.position == SubsystemConstants.ElevatorConstants.EXTEND_SETPOINT_INCH;
   }
 
   @Override
@@ -175,26 +159,19 @@ public class Elevator extends SubsystemBase {
 
     extenderCurrent =
         extenderProfile.calculate(
-            PhysicalConstants.LOOP_PERIOD_SECS, extenderCurrent, extenderGoal);
-
-<<<<<<< Updated upstream
-    barCurrent = barProfile.calculate(PhysicalConstants.LOOP_PERIOD_SECS, barCurrent, barGoal);
-=======
-
->>>>>>> Stashed changes
+            SubsystemConstants.LOOP_PERIOD_SECONDS, extenderCurrent, extenderGoal);
 
     setPositionExtend(extenderCurrent.position, extenderCurrent.velocity);
 
     Logger.processInputs("Elevator", eInputs);
 
-
-   // if (kP.hasChanged(hashCode()) || kI.hasChanged(hashCode())) {
+    // if (kP.hasChanged(hashCode()) || kI.hasChanged(hashCode())) {
     // elevator.configurePID(kP.get(), kI.get(), 0);
-  // }
-   // if (barkP.hasChanged(hashCode())
-   //     || barkV.hasChanged(hashCode())
-  //      || barkG.hasChanged(hashCode())) {}
- // }
+    // }
+    // if (barkP.hasChanged(hashCode())
+    //     || barkV.hasChanged(hashCode())
+    //      || barkG.hasChanged(hashCode())) {}
+    // }
 
- }
+  }
 }

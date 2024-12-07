@@ -7,17 +7,15 @@ package frc.robot.subsystems.arms;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import frc.robot.constants.physicalConstants;
+import frc.robot.constants.SubsystemConstants;
 
 /** Add your docs here. */
 public class PivotIOSim implements PivotIO {
   // private final DCMotor pivotGearbox = DCMotor.getKrakenX60Foc(2);
- 
+
   // public RobotContainer robotContainer = new RobotContainer();
- 
 
   // SIM VARIABLES
   private int gearBoxMotorCount = 2;
@@ -73,7 +71,7 @@ public class PivotIOSim implements PivotIO {
     inputs.velocityDegsPerSec = Math.toDegrees(velocityRadsPerSec);
     inputs.currentAmps = currentAmps;
 
-    sim.update(physicalConstants.LOOP_PERIOD_SECS);
+    sim.update(SubsystemConstants.LOOP_PERIOD_SECONDS);
   }
 
   @Override

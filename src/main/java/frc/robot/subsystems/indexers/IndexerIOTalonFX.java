@@ -46,22 +46,20 @@ public class IndexerIOTalonFX implements IndexerIO {
   public void updateInputs(IndexerIOInputs inputs) {
     BaseStatusSignal.refreshAll(positionRads, velocityRadsPerSec, appliedVolts, currentAmps);
 
-    inputs.positionRads = positionRads.getValueAsDouble();
-    inputs.velocityRadsPerSec = velocityRadsPerSec.getValueAsDouble();
+    inputs.indexerPositionInch = positionRads.getValueAsDouble();
+    inputs.indexerVelocityInchesPerSecond = velocityRadsPerSec.getValueAsDouble();
     inputs.appliedVolts = appliedVolts.getValueAsDouble();
     inputs.currentAmps = currentAmps.getValueAsDouble();
   }
 
   @Override
-  public void setVoltage(double volts) {
+  public void runCharacterization(double volts) {
     talon.setControl(new VoltageOut(volts));
   }
 
   @Override
-  public void setPosition(double positionDegs, double ffVolts) {
-    talon.setControl(
-        new PositionVoltage(
-            Units.degreesToRotations(positionDegs)));
+  public void setPositionSetpoint(double positionDegs, double ffVolts) {
+    talon.setControl(new PositionVoltage(Units.degreesToRotations(positionDegs)));
   }
 
   @Override

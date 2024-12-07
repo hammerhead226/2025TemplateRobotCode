@@ -12,16 +12,11 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
-<<<<<<< Updated upstream
-import frc.robot.constants.PhysicalConstants;
-=======
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.physicalConstants;
->>>>>>> Stashed changes
+import frc.robot.constants.SubsystemConstants;
 import frc.robot.util.Conversions;
 import org.littletonrobotics.junction.Logger;
 
@@ -43,15 +38,15 @@ public class PivotIOTalonFX implements PivotIO {
 
   public PivotIOTalonFX(int leadID, int followID, int gyroID) {
     TalonFXConfiguration config = new TalonFXConfiguration();
-    config.CurrentLimits.StatorCurrentLimit = PhysicalConstants.PivotConstants.CURRENT_LIMIT;
+    config.CurrentLimits.StatorCurrentLimit = SubsystemConstants.PivotConstants.CURRENT_LIMIT;
     config.CurrentLimits.StatorCurrentLimitEnable =
-        PhysicalConstants.PivotConstants.CURRENT_LIMIT_ENABLED;
+        SubsystemConstants.PivotConstants.CURRENT_LIMIT_ENABLED;
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
-    leader = new TalonFX(leadID, PhysicalConstants.CANBUS);
-    follower = new TalonFX(followID, PhysicalConstants.CANBUS);
-    pigeon = new Pigeon2(gyroID, PhysicalConstants.CANBUS);
+    leader = new TalonFX(leadID, SubsystemConstants.CANBUS);
+    follower = new TalonFX(followID, SubsystemConstants.CANBUS);
+    pigeon = new Pigeon2(gyroID, SubsystemConstants.CANBUS);
     pigeon.reset();
 
     leader.getConfigurator().apply(config);
@@ -63,10 +58,10 @@ public class PivotIOTalonFX implements PivotIO {
     startAngleDegs = pitch.getValueAsDouble();
 
     leader.setPosition(
-        Conversions.degreesToFalcon(startAngleDegs, PhysicalConstants.PivotConstants.REDUCTION));
+        Conversions.degreesToFalcon(startAngleDegs, SubsystemConstants.PivotConstants.REDUCTION));
 
     follower.setPosition(
-        Conversions.degreesToFalcon(startAngleDegs, PhysicalConstants.PivotConstants.REDUCTION));
+        Conversions.degreesToFalcon(startAngleDegs, SubsystemConstants.PivotConstants.REDUCTION));
 
     leaderPositionDegs = leader.getPosition();
     velocityDegsPerSec = leader.getVelocity();
@@ -75,7 +70,7 @@ public class PivotIOTalonFX implements PivotIO {
 
     // leader.get
 
-    positionSetpointDegs = PhysicalConstants.PivotConstants.STOW_SETPOINT_DEG;
+    positionSetpointDegs = SubsystemConstants.PivotConstants.STOW_SETPOINT_DEG;
 
     Logger.recordOutput("start angle", startAngleDegs);
 
@@ -94,23 +89,17 @@ public class PivotIOTalonFX implements PivotIO {
     BaseStatusSignal.refreshAll(
         leaderPositionDegs, velocityDegsPerSec, appliedVolts, currentAmps, pitch);
     inputs.gyroConnected = BaseStatusSignal.refreshAll(pitch).equals(StatusCode.OK);
-    inputs.pitch = pitch.getValueAsDouble() + PhysicalConstants.PivotConstants.PIVOT_ZERO_ANGLE;
+    inputs.pitch = pitch.getValueAsDouble() + SubsystemConstants.PivotConstants.PIVOT_ZERO_ANGLE;
     inputs.positionDegs =
         Conversions.falconToDegrees(
-                (leaderPositionDegs.getValueAsDouble()), PhysicalConstants.PivotConstants.REDUCTION)
-            + PhysicalConstants.PivotConstants.PIVOT_ZERO_ANGLE;
+                (leaderPositionDegs.getValueAsDouble()),
+                SubsystemConstants.PivotConstants.REDUCTION)
+            + SubsystemConstants.PivotConstants.PIVOT_ZERO_ANGLE;
 
     // inputs.velocityDegsPerSec =
     //     Conversions.falconToDegrees(
     //         (followPositionDegs.getValueAsDouble()), Constants.PivotConstants.REDUCTION);
-    inputs.velocityDegsPerSec =
-<<<<<<< Updated upstream
-        Conversions.falconToDegrees(
-            velocityDegsPerSec.getValueAsDouble() * 2048,
-            PhysicalConstants.PivotConstants.REDUCTION);
-=======
-       velocityDegsPerSec.getValueAsDouble();
->>>>>>> Stashed changes
+    inputs.velocityDegsPerSec = velocityDegsPerSec.getValueAsDouble();
     inputs.appliedVolts = appliedVolts.getValueAsDouble();
     inputs.currentAmps = currentAmps.getValueAsDouble();
     inputs.positionSetpointDegs = positionSetpointDegs;
@@ -135,14 +124,7 @@ public class PivotIOTalonFX implements PivotIO {
     leader.setControl(
         new PositionVoltage(
             Conversions.degreesToFalcon(
-                positionDegs - 59, PhysicalConstants.PivotConstants.REDUCTION),
-            0,
-            false,
-            ffVolts,
-            0,
-            false,
-            false,
-            false));
+                positionDegs - 59, SubsystemConstants.PivotConstants.REDUCTION)));
   }
 
   @Override

@@ -26,7 +26,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 
 public class FlywheelIOTalonFX implements FlywheelIO {
@@ -75,9 +74,7 @@ public class FlywheelIOTalonFX implements FlywheelIO {
 
   @Override
   public void setVelocity(double velocityRadPerSec, double ffVolts) {
-    leader.setControl(
-        new VelocityVoltage(
-            Units.radiansToRotations(velocityRadPerSec)));
+    leader.setControl(new VelocityVoltage(Units.radiansToRotations(velocityRadPerSec)));
   }
 
   @Override

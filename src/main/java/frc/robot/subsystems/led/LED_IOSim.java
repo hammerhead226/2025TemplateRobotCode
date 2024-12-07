@@ -2,14 +2,14 @@ package frc.robot.subsystems.led;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.constants.PhysicalConstants;
-import frc.robot.constants.PhysicalConstants.LED_STATE;
+import frc.robot.constants.SubsystemConstants;
+import frc.robot.constants.SubsystemConstants.LED_STATE;
 
 public class LED_IOSim implements LED_IO {
   LED_STATE ledState;
 
   public LED_IOSim() {
-    ledState = PhysicalConstants.LED_STATE.BLUE;
+    ledState = SubsystemConstants.LED_STATE.BLUE;
     setLEDState(ledState);
   }
 

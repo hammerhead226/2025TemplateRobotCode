@@ -5,8 +5,7 @@
 package frc.robot.subsystems.led;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.PhysicalConstants.LED_STATE;
-
+import frc.robot.constants.SubsystemConstants.LED_STATE;
 import org.littletonrobotics.junction.Logger;
 
 /** Add your docs here. */
