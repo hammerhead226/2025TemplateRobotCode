@@ -13,6 +13,8 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.SimConstants;
 import frc.robot.constants.SubsystemConstants;
@@ -122,6 +124,16 @@ public class Pivot extends SubsystemBase {
     pivotCurrentStateDegrees = new TrapezoidProfile.State(currentDegrees, 0);
   }
 
+  public Command setPivotTarget(double goal, double threshold){
+
+    
+      return new InstantCommand(()-> setPivotGoal(goal), this).until(()-> atGoal(threshold));
+    
+  }
+
+
+
+
   @Override
   public void periodic() {
     pivot.updateInputs(pInputs);
@@ -140,4 +152,5 @@ public class Pivot extends SubsystemBase {
     Logger.recordOutput("pivot goal", goalDegrees);
     // This method will be called once per scheduler run
   }
+
 }
