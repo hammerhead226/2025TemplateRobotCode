@@ -28,21 +28,6 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
  * constants from Phoenix. Simulation is always based on voltage control.
  */
 public class ModuleIOSim implements ModuleIO {
-<<<<<<< Updated upstream
-
-  private static final double LOOP_PERIOD_SECS = 0.02;
-  private int gearBoxMotorCountDrive = 1;
-  private int gearBoxMotorCountTurn = 1;
-  private double gearingDrive = 6.75;
-  private double gearingTurn = 150.0 / 7.0;
-  private double momentOfInertiaDrive = 0.025;
-  private double momentOfInertiaTurn = 0.004;
-
-  private DCMotorSim driveSim =
-      new DCMotorSim(DCMotor.getNEO(gearBoxMotorCountDrive), gearingDrive, momentOfInertiaDrive);
-  private DCMotorSim turnSim =
-      new DCMotorSim(DCMotor.getNEO(gearBoxMotorCountTurn), gearingTurn, momentOfInertiaTurn);
-=======
   // TunerConstants doesn't support separate sim constants, so they are declared locally
   private static final double DRIVE_KP = 0.05;
   private static final double DRIVE_KD = 0.0;
@@ -57,7 +42,6 @@ public class ModuleIOSim implements ModuleIO {
 
   private final DCMotorSim driveSim;
   private final DCMotorSim turnSim;
->>>>>>> Stashed changes
 
   private boolean driveClosedLoop = false;
   private boolean turnClosedLoop = false;
@@ -67,10 +51,6 @@ public class ModuleIOSim implements ModuleIO {
   private double driveAppliedVolts = 0.0;
   private double turnAppliedVolts = 0.0;
 
-<<<<<<< Updated upstream
-  private double clampedValueLowVolts = -12.0;
-  private double clampedValueHighVolts = 12.0;
-=======
   public ModuleIOSim(SwerveModuleConstants constants) {
     // Create drive and turn sim models
     driveSim =
@@ -87,7 +67,6 @@ public class ModuleIOSim implements ModuleIO {
     // Enable wrapping for turn PID
     turnController.enableContinuousInput(-Math.PI, Math.PI);
   }
->>>>>>> Stashed changes
 
   @Override
   public void updateInputs(ModuleIOInputs inputs) {
@@ -133,17 +112,6 @@ public class ModuleIOSim implements ModuleIO {
   }
 
   @Override
-<<<<<<< Updated upstream
-  public void setDriveVoltage(double volts) {
-    driveAppliedVolts = MathUtil.clamp(volts, clampedValueLowVolts, clampedValueHighVolts);
-    driveSim.setInputVoltage(driveAppliedVolts);
-  }
-
-  @Override
-  public void setTurnVoltage(double volts) {
-    turnAppliedVolts = MathUtil.clamp(volts, clampedValueLowVolts, clampedValueHighVolts);
-    turnSim.setInputVoltage(turnAppliedVolts);
-=======
   public void setDriveOpenLoop(double output) {
     driveClosedLoop = false;
     driveAppliedVolts = output;
@@ -166,6 +134,5 @@ public class ModuleIOSim implements ModuleIO {
   public void setTurnPosition(Rotation2d rotation) {
     turnClosedLoop = true;
     turnController.setSetpoint(rotation.getRadians());
->>>>>>> Stashed changes
   }
 }

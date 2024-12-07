@@ -4,6 +4,7 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.physicalConstants;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
@@ -24,10 +25,7 @@ public class Elevator extends SubsystemBase {
   private static final LoggedNetworkNumber kV = new LoggedNetworkNumber("Elevator/kV");
   private static final LoggedNetworkNumber kA = new LoggedNetworkNumber("Elevator/kA");
 
-  // amp bar gains
 
-  private static final LoggedNetworkNumber barkP = new LoggedNetworkNumber("Bar/kP");
-  private static final LoggedNetworkNumber barkV = new LoggedNetworkNumber("Bar/kV");
   private static final LoggedNetworkNumber barkG = new LoggedNetworkNumber("Bar/kG");
 
   private TrapezoidProfile extenderProfile;
@@ -39,12 +37,7 @@ public class Elevator extends SubsystemBase {
   private static double maxVelocityDegPerSec;
   private static double maxAccelerationDegPerSecSquared;
 
-  private TrapezoidProfile barProfile;
-  private TrapezoidProfile.Constraints barConstraints;
-
-  private TrapezoidProfile.State barGoal = new TrapezoidProfile.State();
-  private TrapezoidProfile.State barCurrent = new TrapezoidProfile.State();
-
+ 
   private double goal;
   // private double barGoalPos;
   private final ElevatorFeedforward elevatorFFModel;
@@ -63,8 +56,7 @@ public class Elevator extends SubsystemBase {
         kP.setDefault(0.44);
         kI.setDefault(0);
 
-        barkP.setDefault(0.25);
-        barkV.setDefault(0.2);
+      
         barkG.setDefault(0);
         break;
       case REPLAY:
@@ -76,8 +68,7 @@ public class Elevator extends SubsystemBase {
         kP.setDefault(15);
         kI.setDefault(0);
 
-        barkP.setDefault(0);
-        barkV.setDefault(0);
+       
         barkG.setDefault(0);
         break;
       case SIM:
@@ -89,8 +80,7 @@ public class Elevator extends SubsystemBase {
         kP.setDefault(1);
         kI.setDefault(0);
 
-        barkP.setDefault(0);
-        barkV.setDefault(0);
+        
         barkG.setDefault(0);
         break;
       default:
@@ -102,8 +92,7 @@ public class Elevator extends SubsystemBase {
         kP.setDefault(15);
         kI.setDefault(0);
 
-        barkP.setDefault(0);
-        barkV.setDefault(0);
+        
         barkG.setDefault(0);
         break;
     }
@@ -115,26 +104,28 @@ public class Elevator extends SubsystemBase {
     maxVelocityDegPerSec = 1200;
     maxAccelerationDegPerSecSquared = 1550;
 
-    barConstraints =
-        new TrapezoidProfile.Constraints(maxVelocityDegPerSec, maxAccelerationDegPerSecSquared);
-    barProfile = new TrapezoidProfile(barConstraints);
-    barCurrent = barProfile.calculate(0, barCurrent, barGoal);
+    
 
     this.elevator.configurePID(kP.get(), 0, 0);
     elevatorFFModel = new ElevatorFeedforward(kS.get(), kG.get(), kV.get(), kA.get());
   }
 
   public boolean atGoal() {
+<<<<<<< Updated upstream
     return (Math.abs(eInputs.elevatorPosition - goal)
         <= PhysicalConstants.ElevatorConstants.THRESHOLD);
+=======
+    return (Math.abs(eInputs.elevatorPositionInch - goal)
+        <= physicalConstants.ElevatorConstants.THRESHOLD);
+>>>>>>> Stashed changes
   }
 
   public double getElevatorPosition() {
-    return eInputs.elevatorPosition;
+    return eInputs.elevatorPositionInch;
   }
 
   private double getElevatorError() {
-    return eInputs.positionSetpoint - eInputs.elevatorPosition;
+    return eInputs.positionSetpointInch - eInputs.elevatorPositionInch;
   }
 
   public boolean elevatorAtSetpoint() {
@@ -186,13 +177,17 @@ public class Elevator extends SubsystemBase {
         extenderProfile.calculate(
             PhysicalConstants.LOOP_PERIOD_SECS, extenderCurrent, extenderGoal);
 
+<<<<<<< Updated upstream
     barCurrent = barProfile.calculate(PhysicalConstants.LOOP_PERIOD_SECS, barCurrent, barGoal);
+=======
+
+>>>>>>> Stashed changes
 
     setPositionExtend(extenderCurrent.position, extenderCurrent.velocity);
 
     Logger.processInputs("Elevator", eInputs);
 
-    Logger.recordOutput("amp bar currentPos", barCurrent.position);
+
    // if (kP.hasChanged(hashCode()) || kI.hasChanged(hashCode())) {
     // elevator.configurePID(kP.get(), kI.get(), 0);
   // }

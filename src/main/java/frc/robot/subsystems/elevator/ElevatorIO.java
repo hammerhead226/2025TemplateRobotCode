@@ -7,11 +7,11 @@ import edu.wpi.first.units.measure.Voltage;
 public interface ElevatorIO {
   @AutoLog
   public static class ElevatorIOInputs {
-    double elevatorPosition = 0;
-    double elevatorVelocity = 0;
+    double elevatorPositionInch = 0;
+    double elevatorVelocityInchesPerSecond = 0;
     double currentAmps = 0;
     double appliedVolts = 0;
-    double positionSetpoint = 0;
+    double positionSetpointInch = 0;
   }
 
   public default void updateInputs(ElevatorIOInputs inputs) {}

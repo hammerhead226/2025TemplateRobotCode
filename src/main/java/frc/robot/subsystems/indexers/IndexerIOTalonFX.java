@@ -9,14 +9,18 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Voltage;
 
 public class IndexerIOTalonFX implements IndexerIO {
   private final TalonFX talon;
 
-  private final StatusSignal<Double> positionRads;
-  private final StatusSignal<Double> velocityRadsPerSec;
-  private final StatusSignal<Double> appliedVolts;
-  private final StatusSignal<Double> currentAmps;
+  private final StatusSignal<Angle> positionRads;
+  private final StatusSignal<AngularVelocity> velocityRadsPerSec;
+  private final StatusSignal<Voltage> appliedVolts;
+  private final StatusSignal<Current> currentAmps;
 
   public IndexerIOTalonFX(int motorID) {
     talon = new TalonFX(motorID);
@@ -57,7 +61,7 @@ public class IndexerIOTalonFX implements IndexerIO {
   public void setPosition(double positionDegs, double ffVolts) {
     talon.setControl(
         new PositionVoltage(
-            Units.degreesToRotations(positionDegs), 0, false, ffVolts, 0, false, false, false));
+            Units.degreesToRotations(positionDegs)));
   }
 
   @Override

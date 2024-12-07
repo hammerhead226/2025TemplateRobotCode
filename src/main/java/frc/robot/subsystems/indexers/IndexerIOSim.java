@@ -3,6 +3,7 @@ package frc.robot.subsystems.indexers;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.constants.PhysicalConstants;
 
@@ -13,7 +14,7 @@ public class IndexerIOSim implements IndexerIO {
   private int numberOFIndexerMotors = 0;
 
   private final DCMotor indexer = DCMotor.getKrakenX60(numberOFIndexerMotors);
-  private final DCMotorSim sim = new DCMotorSim(indexer, indexerGearing, indexerMOI);
+  private final DCMotorSim sim = new DCMotorSim(LinearSystemId.createDCMotorSystem(indexer, indexerMOI, indexerGearing), indexer);
   private PIDController pid = new PIDController(0.0, 0.0, 0.0);
 
   private double clampedValueLowVolts = -12.0;

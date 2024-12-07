@@ -13,7 +13,15 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+<<<<<<< Updated upstream
 import frc.robot.constants.PhysicalConstants;
+=======
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Voltage;
+import frc.robot.physicalConstants;
+>>>>>>> Stashed changes
 import frc.robot.util.Conversions;
 import org.littletonrobotics.junction.Logger;
 
@@ -27,11 +35,11 @@ public class PivotIOTalonFX implements PivotIO {
 
   private double startAngleDegs;
 
-  private final StatusSignal<Double> leaderPositionDegs;
-  private final StatusSignal<Double> velocityDegsPerSec;
-  private final StatusSignal<Double> appliedVolts;
-  private final StatusSignal<Double> currentAmps;
-  private final StatusSignal<Double> pitch;
+  private final StatusSignal<Angle> leaderPositionDegs;
+  private final StatusSignal<AngularVelocity> velocityDegsPerSec;
+  private final StatusSignal<Voltage> appliedVolts;
+  private final StatusSignal<Current> currentAmps;
+  private final StatusSignal<Angle> pitch;
 
   public PivotIOTalonFX(int leadID, int followID, int gyroID) {
     TalonFXConfiguration config = new TalonFXConfiguration();
@@ -96,9 +104,13 @@ public class PivotIOTalonFX implements PivotIO {
     //     Conversions.falconToDegrees(
     //         (followPositionDegs.getValueAsDouble()), Constants.PivotConstants.REDUCTION);
     inputs.velocityDegsPerSec =
+<<<<<<< Updated upstream
         Conversions.falconToDegrees(
             velocityDegsPerSec.getValueAsDouble() * 2048,
             PhysicalConstants.PivotConstants.REDUCTION);
+=======
+       velocityDegsPerSec.getValueAsDouble();
+>>>>>>> Stashed changes
     inputs.appliedVolts = appliedVolts.getValueAsDouble();
     inputs.currentAmps = currentAmps.getValueAsDouble();
     inputs.positionSetpointDegs = positionSetpointDegs;

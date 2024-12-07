@@ -18,7 +18,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.CurrentUnit;
+
 
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.robot.constants.physicalConstants;
@@ -26,31 +26,63 @@ import frc.robot.constants.physicalConstants;
 /** Add your docs here. */
 public class ElevatorIOSim implements ElevatorIO {
 
+<<<<<<< Updated upstream
   private final DCMotor simGearbox = DCMotor.getKrakenX60Foc(2);
   private ElevatorSim sim = new ElevatorSim(simGearbox, 1, 1, 0.01, 0.0, 3, true, 0.0);
   private PIDController pid = new PIDController(0, 0, 0);
 
   private Distance position = Inches.of(0);
   private LinearVelocity velocityInchPerSec = InchesPerSecond.of(0);
+=======
+  // SIM VARIABLES (CHANGE)
+  private int gearBoxMotorCount = 2;
+  private int gearing = 1;
+  private double carriageMassKg = 1;
+  private double drumRadiusMeters = 0.01;
+  private double minHeightMeters = 0;
+  private double maxHeightMeters = 3;
+  private boolean simulateGravity = true;
+  private double initialPositionMeters = 0.0;
+
+  private final DCMotor simGearbox = DCMotor.getFalcon500(gearBoxMotorCount);
+  private ElevatorSim sim =
+      new ElevatorSim(
+          simGearbox,
+          gearing,
+          carriageMassKg,
+          drumRadiusMeters,
+          minHeightMeters,
+          maxHeightMeters,
+          simulateGravity,
+          initialPositionMeters);
+  private PIDController pid = new PIDController(0, 0, 0);
+
+  private Distance position = Inches.of(0);
+  private LinearVelocity velocity = InchesPerSecond.of(0);
+>>>>>>> Stashed changes
   private Voltage appliedVolts = Volts.of(0.0);
   private Current currentAmps = Amps.of(0.0);
   private Distance positionSetpointInches = Inches.of(0);
 
-  private double clampedValueLowVolts = -12.0;
-  private double clampedValueHighVolts = 12.0;
 
-  private double metersToInches = 39.37;
+
+  
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
     positionSetpointInches = Inches.of(pid.getSetpoint());
 
+<<<<<<< Updated upstream
+=======
+    
+>>>>>>> Stashed changes
     appliedVolts.plus(
         Volts.of(MathUtil.clamp(
             pid.calculate(Meters.of(sim.getPositionMeters()).in(Inches), positionSetpointInches.in(Inches)), -12.0, 12)));
 
     sim.setInputVoltage(appliedVolts.in(Volts));
 
+<<<<<<< Updated upstream
     position = Inches.of(Meters.of(sim.getPositionMeters()).in(Inches));
     position = Meters.of(sim.getPositionMeters());
 
@@ -61,6 +93,16 @@ public class ElevatorIOSim implements ElevatorIO {
     inputs.appliedVolts = appliedVolts.in(Volts);
     inputs.elevatorPosition = position;
     inputs.elevatorVelocity = velocityInchPerSec;
+=======
+    position = Meters.of(sim.getPositionMeters());
+    velocity = MetersPerSecond.of(sim.getVelocityMetersPerSecond());
+    currentAmps = Amps.of(sim.getCurrentDrawAmps());
+
+    inputs.positionSetpointInch = positionSetpointInches.in(Inches);
+    inputs.appliedVolts = appliedVolts.in(Volts);
+    inputs.elevatorPositionInch = position.in(Inches);
+    inputs.elevatorVelocityInchesPerSecond = velocity.in(InchesPerSecond);
+>>>>>>> Stashed changes
     inputs.currentAmps = currentAmps.in(Amps);
 
     sim.update(physicalConstants.LOOP_PERIOD_SECS);

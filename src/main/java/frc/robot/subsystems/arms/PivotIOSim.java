@@ -14,13 +14,10 @@ import frc.robot.constants.physicalConstants;
 
 /** Add your docs here. */
 public class PivotIOSim implements PivotIO {
-<<<<<<< Updated upstream
-=======
-  private final DCMotor pivotGearbox = DCMotor.getKrakenX60Foc(2);
+  // private final DCMotor pivotGearbox = DCMotor.getKrakenX60Foc(2);
  
-  public RobotContainer robotContainer = new RobotContainer();
+  // public RobotContainer robotContainer = new RobotContainer();
  
->>>>>>> Stashed changes
 
   // SIM VARIABLES
   private int gearBoxMotorCount = 2;
