@@ -7,6 +7,8 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.SimConstants;
 import frc.robot.constants.SubsystemConstants;
@@ -110,8 +112,8 @@ public class Elevator extends SubsystemBase {
     return eInputs.positionSetpointInch - eInputs.elevatorPositionInch;
   }
 
-  public boolean elevatorAtSetpoint() {
-    return (Math.abs(getElevatorError()) <= SubsystemConstants.ElevatorConstants.THRESHOLD);
+  public boolean elevatorAtSetpoint(double thersholdInches) {
+    return (Math.abs(getElevatorError()) <= thersholdInches);
   }
 
   // public void setbarCurrent(double current) {
@@ -151,6 +153,12 @@ public class Elevator extends SubsystemBase {
     return extenderGoal.position == SubsystemConstants.ElevatorConstants.EXTEND_SETPOINT_INCH;
   }
 
+  public Command setElevatorTarget(double goalInches, double thersholdInches){
+
+    return new InstantCommand(()-> setExtenderGoal(goalInches), this).until(()-> elevatorAtSetpoint(thersholdInches));
+  }
+
+  
   @Override
   public void periodic() {
     Logger.recordOutput("Alliance", DriverStation.getAlliance().isPresent());

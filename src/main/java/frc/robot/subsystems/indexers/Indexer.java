@@ -10,6 +10,8 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.SimConstants;
 import frc.robot.constants.SubsystemConstants;
@@ -76,6 +78,10 @@ public class Indexer extends SubsystemBase {
     ff = new ElevatorFeedforward(0, kG, kV);
   }
 
+  public boolean indexerAtGoal(double thersholdInches){
+
+    return (Math.abs(indexerCurrentStateRotations.position - indexerGoalStateRotations.position) <= thersholdInches);
+  }
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -101,4 +107,10 @@ public class Indexer extends SubsystemBase {
     double rollerDiameterInches = 1;
     indexerGoalStateRotations.position += linearDistanceInches / (rollerDiameterInches * Math.PI);
   }
+
+  public Command indexCommand(double linearDistanceInches, double thersholdInches){
+
+    return new InstantCommand(()-> index(linearDistanceInches), this).until(()-> indexerAtGoal(thersholdInches));
+  }
+  
 }

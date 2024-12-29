@@ -22,7 +22,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Arm extends SubsystemBase {
   private final ArmIO pivot;
-  private final PivotIOInputsAutoLogged pInputs = new PivotIOInputsAutoLogged();
+  private final ArmIOInputsAutoLogged pInputs = new ArmIOInputsAutoLogged();
 
   private static double kP;
   private static double kG;

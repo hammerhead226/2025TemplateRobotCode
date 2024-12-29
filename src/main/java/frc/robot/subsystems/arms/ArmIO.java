@@ -4,7 +4,7 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface ArmIO {
   @AutoLog
-  public static class PivotIOInputs {
+  public static class ArmIOInputs {
     public double velocityDegsPerSec = 0;
     public double positionDegs = 0;
     public double currentAmps = 0;
@@ -15,7 +15,7 @@ public interface ArmIO {
     public double pitch = 0;
   }
 
-  public default void updateInputs(PivotIOInputs inputs) {}
+  public default void updateInputs(ArmIOInputs inputs) {}
 
   public default void setBrakeMode(boolean bool) {}
 

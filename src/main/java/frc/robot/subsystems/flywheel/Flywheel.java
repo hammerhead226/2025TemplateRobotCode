@@ -20,6 +20,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.constants.SimConstants;
@@ -88,6 +89,22 @@ public class Flywheel extends SubsystemBase {
     Logger.recordOutput("Flywheel/SetpointRPM", velocityRPM);
   }
 
+
+  public Command runVoltsCommmand(double volts){
+
+    return new InstantCommand(()-> runVolts(volts), this);
+  }
+
+  public Command runVelocityCommand(double velocityRPM){
+
+    return new InstantCommand(()-> runVelocity(velocityRPM), this);
+  }
+
+  public Command flywheelStop(){
+    return new InstantCommand(()-> stop(), this);
+  }
+
+  
   /** Stops the flywheel. */
   public void stop() {
     io.stop();

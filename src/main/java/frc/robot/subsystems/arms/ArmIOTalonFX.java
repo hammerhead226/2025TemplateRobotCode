@@ -85,7 +85,7 @@ public class ArmIOTalonFX implements ArmIO {
   }
 
   @Override
-  public void updateInputs(PivotIOInputs inputs) {
+  public void updateInputs(ArmIOInputs inputs) {
     BaseStatusSignal.refreshAll(
         leaderPositionDegs, velocityDegsPerSec, appliedVolts, currentAmps, pitch);
     inputs.gyroConnected = BaseStatusSignal.refreshAll(pitch).equals(StatusCode.OK);

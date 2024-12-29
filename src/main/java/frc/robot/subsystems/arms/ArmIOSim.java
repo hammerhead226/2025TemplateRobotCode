@@ -50,7 +50,7 @@ public class ArmIOSim implements ArmIO {
   private double clampedValueHighVolts = 12.0;
 
   @Override
-  public void updateInputs(PivotIOInputs inputs) {
+  public void updateInputs(ArmIOInputs inputs) {
     positionSetpointRads = pid.getSetpoint();
 
     appliedVolts +=
