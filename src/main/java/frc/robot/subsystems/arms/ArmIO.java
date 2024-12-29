@@ -2,7 +2,7 @@ package frc.robot.subsystems.arms;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface PivotIO {
+public interface ArmIO {
   @AutoLog
   public static class PivotIOInputs {
     public double velocityDegsPerSec = 0;

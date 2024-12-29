@@ -20,7 +20,7 @@ import frc.robot.constants.SubsystemConstants;
 import frc.robot.util.Conversions;
 import org.littletonrobotics.junction.Logger;
 
-public class PivotIOTalonFX implements PivotIO {
+public class ArmIOTalonFX implements ArmIO {
   private final TalonFX leader;
   private final TalonFX follower;
 
@@ -36,7 +36,7 @@ public class PivotIOTalonFX implements PivotIO {
   private final StatusSignal<Current> currentAmps;
   private final StatusSignal<Angle> pitch;
 
-  public PivotIOTalonFX(int leadID, int followID, int gyroID) {
+  public ArmIOTalonFX(int leadID, int followID, int gyroID) {
     TalonFXConfiguration config = new TalonFXConfiguration();
     config.CurrentLimits.StatorCurrentLimit = SubsystemConstants.PivotConstants.CURRENT_LIMIT;
     config.CurrentLimits.StatorCurrentLimitEnable =

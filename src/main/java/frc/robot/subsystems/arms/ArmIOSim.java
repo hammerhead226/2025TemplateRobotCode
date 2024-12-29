@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.constants.SubsystemConstants;
 
 /** Add your docs here. */
-public class PivotIOSim implements PivotIO {
+public class ArmIOSim implements ArmIO {
   // private final DCMotor pivotGearbox = DCMotor.getKrakenX60Foc(2);
 
   // public RobotContainer robotContainer = new RobotContainer();

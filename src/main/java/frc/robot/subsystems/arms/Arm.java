@@ -20,8 +20,8 @@ import frc.robot.constants.SimConstants;
 import frc.robot.constants.SubsystemConstants;
 import org.littletonrobotics.junction.Logger;
 
-public class Pivot extends SubsystemBase {
-  private final PivotIO pivot;
+public class Arm extends SubsystemBase {
+  private final ArmIO pivot;
   private final PivotIOInputsAutoLogged pInputs = new PivotIOInputsAutoLogged();
 
   private static double kP;
@@ -42,7 +42,7 @@ public class Pivot extends SubsystemBase {
   private ArmFeedforward pivotFFModel;
 
   /** Creates a new Pivot. */
-  public Pivot(PivotIO pivot) {
+  public Arm(ArmIO pivot) {
     this.pivot = pivot;
     switch (SimConstants.currentMode) {
       case REAL:
