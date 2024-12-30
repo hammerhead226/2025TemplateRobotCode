@@ -99,12 +99,10 @@ public class LED_IOCANdle implements LED_IO {
         // led.set(Constants.LEDConstants.COLOR_VIOLET);
         break;
       case GREY:
-        // TODO:: SHOOT NOTE | GREY
         candle.clearAnimation(0);
         candle.setLEDs(137, 129, 123);
         break;
       case GREEN:
-        // TODO:: SENSOR SEES NOTE | GREEN
         candle.clearAnimation(0);
         candle.setLEDs(0, 255, 0, 0, 0, 57 + 24);
         break;

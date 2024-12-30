@@ -67,8 +67,9 @@ public class Arm extends SubsystemBase {
         break;
     }
 
-    maxVelocityDegPerSec = 150;
-    maxAccelerationDegPerSecSquared = 226;
+    // CHANGE PER ARM
+    maxVelocityDegPerSec = 1;
+    maxAccelerationDegPerSecSquared = 1;
     // maxAccelerationDegPerSecSquared = 180;
 
     pivotConstraints =
@@ -124,15 +125,10 @@ public class Arm extends SubsystemBase {
     pivotCurrentStateDegrees = new TrapezoidProfile.State(currentDegrees, 0);
   }
 
-  public Command setPivotTarget(double goal, double threshold){
+  public Command setPivotTarget(double goal, double threshold) {
 
-    
-      return new InstantCommand(()-> setPivotGoal(goal), this).until(()-> atGoal(threshold));
-    
+    return new InstantCommand(() -> setPivotGoal(goal), this).until(() -> atGoal(threshold));
   }
-
-
-
 
   @Override
   public void periodic() {
@@ -152,5 +148,4 @@ public class Arm extends SubsystemBase {
     Logger.recordOutput("pivot goal", goalDegrees);
     // This method will be called once per scheduler run
   }
-
 }

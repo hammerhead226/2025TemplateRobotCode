@@ -37,8 +37,8 @@ public class LED extends SubsystemBase {
     Logger.recordOutput("Set State", state);
   }
 
-  public Command setStateCommand(LED_STATE state){
+  public Command setStateCommand(LED_STATE state) {
 
-    return new InstantCommand(()-> setState(state), this);  
+    return new InstantCommand(() -> setState(state), this);
   }
 }

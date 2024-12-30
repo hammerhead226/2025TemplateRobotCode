@@ -21,7 +21,7 @@ public final class SubsystemConstants {
   public static final double LOOP_PERIOD_SECONDS = 0.02;
 
   public static class IntakeConstants {
-    public static final int CURRENT_LIMIT = 40;
+    public static final double CURRENT_LIMIT = 40.0;
     public static final boolean CURRENT_LIMIT_ENABLED = true;
   }
 
@@ -32,25 +32,23 @@ public final class SubsystemConstants {
     public static final boolean CURRENT_LIMIT_ENABLED = true;
 
     public static final double RETRACT_SETPOINT_INCH = 0;
-    public static final double EXTEND_SETPOINT_INCH = 20.9;
+    public static final double EXTEND_SETPOINT_INCH = 0; // DELETE?
     public static final double THRESHOLD = 3;
 
     public static final double[] PID = {0, 0, 0};
-
-    public static final double REDUCTION = (25.0 / 1.0);
+    public static final double ELEVATOR_GEAR_RATIO = 1;
   }
 
-  public static final class PivotConstants {
+  public static final class ArmConstants {
     public static final double CURRENT_LIMIT = 35.0;
     public static final boolean CURRENT_LIMIT_ENABLED = true;
 
     public static final double THRESHOLD = 1;
     public static final double[] PID = {0, 0, 0};
-    public static final double REDUCTION =
-        (15.0 / 1.0) * (34.0 / 24.0) * (24.0 / 18.0) * (50.0 / 14.0);
-    public static final double STOW_SETPOINT_DEG = 50.7;
+    public static final double ARM_GEAR_RATIO = 1;
 
-    public static final double PIVOT_ZERO_ANGLE = 59;
+    public static final double ARM_ZERO_ANGLE = 0;
+    public static final double STOW_SETPOINT_DEG = 0; // DELETE?
   }
 
   public static class LEDConstants {

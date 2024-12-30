@@ -15,12 +15,12 @@ import frc.robot.constants.SubsystemConstants;
 public class ElevatorIOSim implements ElevatorIO {
 
   // SIM VARIABLES (CHANGE)
-  private int gearBoxMotorCount = 2;
+  private int gearBoxMotorCount = 1;
   private int gearing = 1;
   private double carriageMassKg = 1;
-  private double drumRadiusMeters = 0.01;
+  private double drumRadiusMeters = 1;
   private double minHeightMeters = 0;
-  private double maxHeightMeters = 3;
+  private double maxHeightMeters = 1;
   private boolean simulateGravity = true;
   private double initialPositionMeters = 0.0;
 

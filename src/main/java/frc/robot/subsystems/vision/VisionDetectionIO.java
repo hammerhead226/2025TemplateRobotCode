@@ -13,9 +13,8 @@
 
 package frc.robot.subsystems.vision;
 
-import org.littletonrobotics.junction.AutoLog;
-
 import edu.wpi.first.math.geometry.Rotation2d;
+import org.littletonrobotics.junction.AutoLog;
 
 public interface VisionDetectionIO {
   @AutoLog
@@ -53,8 +52,6 @@ public interface VisionDetectionIO {
 
     public double aPIPELINELATENCY;
     public double aCAPTURELATENCY;
-
-
   }
 
   /** Represents the angle to a simple target, not used for pose estimation. */

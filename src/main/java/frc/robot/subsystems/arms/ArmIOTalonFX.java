@@ -58,10 +58,12 @@ public class ArmIOTalonFX implements ArmIO {
     startAngleDegs = pitch.getValueAsDouble();
 
     leader.setPosition(
-        Conversions.degreesToFalcon(startAngleDegs, SubsystemConstants.PivotConstants.REDUCTION));
+        Conversions.degreesToFalcon(
+            startAngleDegs, SubsystemConstants.ArmConstants.ARM_GEAR_RATIO));
 
     follower.setPosition(
-        Conversions.degreesToFalcon(startAngleDegs, SubsystemConstants.PivotConstants.REDUCTION));
+        Conversions.degreesToFalcon(
+            startAngleDegs, SubsystemConstants.ArmConstants.ARM_GEAR_RATIO));
 
     leaderPositionDegs = leader.getPosition();
     velocityDegsPerSec = leader.getVelocity();
@@ -70,7 +72,7 @@ public class ArmIOTalonFX implements ArmIO {
 
     // leader.get
 
-    positionSetpointDegs = SubsystemConstants.PivotConstants.STOW_SETPOINT_DEG;
+    positionSetpointDegs = SubsystemConstants.ArmConstants.STOW_SETPOINT_DEG;
 
     Logger.recordOutput("start angle", startAngleDegs);
 
@@ -89,12 +91,12 @@ public class ArmIOTalonFX implements ArmIO {
     BaseStatusSignal.refreshAll(
         leaderPositionDegs, velocityDegsPerSec, appliedVolts, currentAmps, pitch);
     inputs.gyroConnected = BaseStatusSignal.refreshAll(pitch).equals(StatusCode.OK);
-    inputs.pitch = pitch.getValueAsDouble() + SubsystemConstants.PivotConstants.PIVOT_ZERO_ANGLE;
+    inputs.pitch = pitch.getValueAsDouble() + SubsystemConstants.ArmConstants.ARM_ZERO_ANGLE;
     inputs.positionDegs =
         Conversions.falconToDegrees(
                 (leaderPositionDegs.getValueAsDouble()),
-                SubsystemConstants.PivotConstants.REDUCTION)
-            + SubsystemConstants.PivotConstants.PIVOT_ZERO_ANGLE;
+                SubsystemConstants.ArmConstants.ARM_GEAR_RATIO)
+            + SubsystemConstants.ArmConstants.ARM_ZERO_ANGLE;
 
     // inputs.velocityDegsPerSec =
     //     Conversions.falconToDegrees(
@@ -124,7 +126,7 @@ public class ArmIOTalonFX implements ArmIO {
     leader.setControl(
         new PositionVoltage(
             Conversions.degreesToFalcon(
-                positionDegs - 59, SubsystemConstants.PivotConstants.REDUCTION)));
+                positionDegs, SubsystemConstants.ArmConstants.ARM_GEAR_RATIO))); // CHECK FOR STOW ANGLE (positionDegs - 59)
   }
 
   @Override

@@ -42,12 +42,12 @@ public class Flywheel extends SubsystemBase {
     switch (SimConstants.currentMode) {
       case REAL:
       case REPLAY:
-        ffModel = new SimpleMotorFeedforward(0.1, 0.05);
-        io.configurePID(1.0, 0.0, 0.0);
+        ffModel = new SimpleMotorFeedforward(0.0, 0.0);
+        io.configurePID(0.0, 0.0, 0.0);
         break;
       case SIM:
-        ffModel = new SimpleMotorFeedforward(0.0, 0.03);
-        io.configurePID(0.5, 0.0, 0.0);
+        ffModel = new SimpleMotorFeedforward(0.0, 0.0);
+        io.configurePID(0.0, 0.0, 0.0);
         break;
       default:
         ffModel = new SimpleMotorFeedforward(0.0, 0.0);
@@ -89,22 +89,20 @@ public class Flywheel extends SubsystemBase {
     Logger.recordOutput("Flywheel/SetpointRPM", velocityRPM);
   }
 
+  public Command runVoltsCommmand(double volts) {
 
-  public Command runVoltsCommmand(double volts){
-
-    return new InstantCommand(()-> runVolts(volts), this);
+    return new InstantCommand(() -> runVolts(volts), this);
   }
 
-  public Command runVelocityCommand(double velocityRPM){
+  public Command runVelocityCommand(double velocityRPM) {
 
-    return new InstantCommand(()-> runVelocity(velocityRPM), this);
+    return new InstantCommand(() -> runVelocity(velocityRPM), this);
   }
 
-  public Command flywheelStop(){
-    return new InstantCommand(()-> stop(), this);
+  public Command flywheelStop() {
+    return new InstantCommand(() -> stop(), this);
   }
 
-  
   /** Stops the flywheel. */
   public void stop() {
     io.stop();

@@ -43,29 +43,30 @@ public class Indexer extends SubsystemBase {
 
     switch (SimConstants.currentMode) {
       case REAL:
-        kG = 0.29;
-        kV = 1;
-        kP = 1.123;
+        kG = 0.0;
+        kV = 0.0;
+        kP = 0.0;
         break;
       case REPLAY:
-        kG = 0.29;
-        kV = 1;
-        kP = 1.123;
+        kG = 0.0;
+        kV = 0.0;
+        kP = 0.0;
         break;
       case SIM:
-        kG = 0.29;
-        kV = 1;
-        kP = 1.123;
+        kG = 0.0;
+        kV = 0.0;
+        kP = 0.0;
         break;
       default:
-        kG = 0.29;
-        kV = 1;
-        kP = 1.123;
+        kG = 0.0;
+        kV = 0.0;
+        kP = 0.0;
         break;
     }
 
-    maxVelocityRotPerSec = 4;
-    maxAccelerationRotPerSecSquared = 4;
+    // CHANGE THESE VALUES TO MATCH THE INDEXER
+    maxVelocityRotPerSec = 1;
+    maxAccelerationRotPerSecSquared = 1;
 
     indexerConstraints =
         new TrapezoidProfile.Constraints(maxVelocityRotPerSec, maxAccelerationRotPerSecSquared);
@@ -78,10 +79,12 @@ public class Indexer extends SubsystemBase {
     ff = new ElevatorFeedforward(0, kG, kV);
   }
 
-  public boolean indexerAtGoal(double thersholdInches){
+  public boolean indexerAtGoal(double thersholdInches) {
 
-    return (Math.abs(indexerCurrentStateRotations.position - indexerGoalStateRotations.position) <= thersholdInches);
+    return (Math.abs(indexerCurrentStateRotations.position - indexerGoalStateRotations.position)
+        <= thersholdInches);
   }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -108,9 +111,9 @@ public class Indexer extends SubsystemBase {
     indexerGoalStateRotations.position += linearDistanceInches / (rollerDiameterInches * Math.PI);
   }
 
-  public Command indexCommand(double linearDistanceInches, double thersholdInches){
+  public Command indexCommand(double linearDistanceInches, double thersholdInches) {
 
-    return new InstantCommand(()-> index(linearDistanceInches), this).until(()-> indexerAtGoal(thersholdInches));
+    return new InstantCommand(() -> index(linearDistanceInches), this)
+        .until(() -> indexerAtGoal(thersholdInches));
   }
-  
 }

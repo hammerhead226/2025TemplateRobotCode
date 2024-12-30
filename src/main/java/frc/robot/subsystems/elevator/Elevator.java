@@ -31,14 +31,17 @@ public class Elevator extends SubsystemBase {
 
   private static final LoggedNetworkNumber barkG = new LoggedNetworkNumber("Bar/kG");
 
+  // CHANGE THESE VALUES TO MATCH THE ELEVATOR
+  private static final int maxVelocityExtender = 1;
+  private static final int maxAccelerationExtender = 1;
+
   private TrapezoidProfile extenderProfile;
   private TrapezoidProfile.Constraints extenderConstraints =
-      new TrapezoidProfile.Constraints(30, 85);
+      new TrapezoidProfile.Constraints(maxVelocityExtender, maxAccelerationExtender);
   private TrapezoidProfile.State extenderGoal = new TrapezoidProfile.State();
   private TrapezoidProfile.State extenderCurrent = new TrapezoidProfile.State();
 
   private double goal;
-  // private double barGoalPos;
   private final ElevatorFeedforward elevatorFFModel;
 
   public Elevator(ElevatorIO elevator) {
@@ -47,29 +50,29 @@ public class Elevator extends SubsystemBase {
     switch (SimConstants.currentMode) {
       case REAL:
         kS.setDefault(0);
-        kG.setDefault(0.25);
+        kG.setDefault(0);
         kV.setDefault(0);
         kA.setDefault(0);
 
-        kP.setDefault(0.44);
+        kP.setDefault(0);
         kI.setDefault(0);
 
         barkG.setDefault(0);
         break;
       case REPLAY:
         kS.setDefault(0);
-        kG.setDefault(0.13);
+        kG.setDefault(0);
         kV.setDefault(0);
         kA.setDefault(0);
 
-        kP.setDefault(15);
+        kP.setDefault(0);
         kI.setDefault(0);
 
         barkG.setDefault(0);
         break;
       case SIM:
         kS.setDefault(0);
-        kG.setDefault(0.04);
+        kG.setDefault(0);
         kV.setDefault(0);
         kA.setDefault(0);
 
@@ -80,18 +83,19 @@ public class Elevator extends SubsystemBase {
         break;
       default:
         kS.setDefault(0);
-        kG.setDefault(0.13);
+        kG.setDefault(0);
         kV.setDefault(0);
         kA.setDefault(0);
 
-        kP.setDefault(15);
+        kP.setDefault(0);
         kI.setDefault(0);
 
         barkG.setDefault(0);
         break;
     }
 
-    setExtenderGoal(0.162);
+    // CHANGE THIS VALUE TO MATCH THE ELEVATOR
+    setExtenderGoal(1);
     extenderProfile = new TrapezoidProfile(extenderConstraints);
     extenderCurrent = extenderProfile.calculate(0, extenderCurrent, extenderGoal);
 
@@ -115,11 +119,6 @@ public class Elevator extends SubsystemBase {
   public boolean elevatorAtSetpoint(double thersholdInches) {
     return (Math.abs(getElevatorError()) <= thersholdInches);
   }
-
-  // public void setbarCurrent(double current) {
-
-  //   barCurrent = new TrapezoidProfile.State(current, 0);
-  // }
 
   public void setExtenderGoal(double setpoint) {
     goal = setpoint;
@@ -153,12 +152,12 @@ public class Elevator extends SubsystemBase {
     return extenderGoal.position == SubsystemConstants.ElevatorConstants.EXTEND_SETPOINT_INCH;
   }
 
-  public Command setElevatorTarget(double goalInches, double thersholdInches){
+  public Command setElevatorTarget(double goalInches, double thersholdInches) {
 
-    return new InstantCommand(()-> setExtenderGoal(goalInches), this).until(()-> elevatorAtSetpoint(thersholdInches));
+    return new InstantCommand(() -> setExtenderGoal(goalInches), this)
+        .until(() -> elevatorAtSetpoint(thersholdInches));
   }
 
-  
   @Override
   public void periodic() {
     Logger.recordOutput("Alliance", DriverStation.getAlliance().isPresent());
@@ -172,14 +171,5 @@ public class Elevator extends SubsystemBase {
     setPositionExtend(extenderCurrent.position, extenderCurrent.velocity);
 
     Logger.processInputs("Elevator", eInputs);
-
-    // if (kP.hasChanged(hashCode()) || kI.hasChanged(hashCode())) {
-    // elevator.configurePID(kP.get(), kI.get(), 0);
-    // }
-    // if (barkP.hasChanged(hashCode())
-    //     || barkV.hasChanged(hashCode())
-    //      || barkG.hasChanged(hashCode())) {}
-    // }
-
   }
 }

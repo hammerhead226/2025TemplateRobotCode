@@ -17,11 +17,11 @@ public class ArmIOSim implements ArmIO {
 
   // public RobotContainer robotContainer = new RobotContainer();
 
-  // SIM VARIABLES
-  private int gearBoxMotorCount = 2;
-  private double gearing = 5;
-  private double armLength = Units.inchesToMeters(20);
-  private double momentOfInertia = SingleJointedArmSim.estimateMOI(armLength, 0.1);
+  // SIM VARIABLES (CHANGE)
+  private int gearBoxMotorCount = 1;
+  private double gearing = 1;
+  private double armLength = Units.inchesToMeters(1); // CHANGE PER ARM
+  private double momentOfInertia = SingleJointedArmSim.estimateMOI(armLength, 1); // CHANGE PER ARM
   private double minAngleRadians = 0;
   private double maxAngleRadians = Math.PI;
   private boolean simulateGravity = true;
