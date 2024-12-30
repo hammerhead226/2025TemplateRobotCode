@@ -15,37 +15,50 @@ package frc.robot.subsystems.vision;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
-public interface VisionIO {
+public interface VisionDetectionIO {
   @AutoLog
   public static class VisionIOInputs {
     public boolean connected = false;
     public TargetObservation latestTargetObservation =
         new TargetObservation(new Rotation2d(), new Rotation2d());
     public double heartBeat = 0;
-    public PoseObservation[] poseObservations = new PoseObservation[0];
-    public int[] tagIds = new int[0];
+
+    public double latency;
+    public double tagSpan;
+    public double avgTagDist;
+    public double avgTagArea;
+
+    public double iTX;
+    public double iTY;
+    public double iTA;
+    public double iHB;
+    public boolean iTV;
+
+    public double iTHOR;
+    public double iTVERT;
+
+    public double iPIPELINELATENCY;
+    public double iCAPTURELATENCY;
+
+    public double aTX;
+    public double aTY;
+    public double aTA;
+    public double aHB;
+    public boolean aTV;
+
+    public double aTHOR;
+    public double aTVERT;
+
+    public double aPIPELINELATENCY;
+    public double aCAPTURELATENCY;
+
+
   }
 
   /** Represents the angle to a simple target, not used for pose estimation. */
   public static record TargetObservation(Rotation2d tx, Rotation2d ty) {}
-
-  /** Represents a robot pose sample used for pose estimation. */
-  public static record PoseObservation(
-      double timestamp,
-      Pose3d pose,
-      double ambiguity,
-      int tagCount,
-      double averageTagDistance,
-      PoseObservationType type) {}
-
-  public static enum PoseObservationType {
-    MEGATAG_1,
-    MEGATAG_2,
-    PHOTONVISION
-  }
 
   public default void updateInputs(VisionIOInputs inputs) {}
 }

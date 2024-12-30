@@ -14,38 +14,32 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.networktables.DoubleArrayPublisher;
-import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotController;
 
 /** IO implementation for real Limelight hardware. */
-public class VisionIOObjectDetection implements VisionIO {
+public class VisionDetectionIOLimelight implements VisionDetectionIO {
     // Second class for the limelight pointing DOWN so it doesn't constantly check for apriltags to update orientation
-    private final DoubleArrayPublisher orientationPublisher;
+
     private final DoubleSubscriber latencySubscriber;
     private final DoubleSubscriber txSubscriber;
     private final DoubleSubscriber tySubscriber;
-    private final DoubleArraySubscriber megatag1Subscriber;
-    private final DoubleArraySubscriber megatag2Subscriber;
+    private final DoubleSubscriber hbSubscriber;
 
-    public VisionIOObjectDetection(String name) {
+    public VisionDetectionIOLimelight(String name) {
         var table = NetworkTableInstance.getDefault().getTable(name);
-        orientationPublisher = table.getDoubleArrayTopic("robot_orientation_set").publish();
         latencySubscriber = table.getDoubleTopic("tl").subscribe(0.0);
         txSubscriber = table.getDoubleTopic("tx").subscribe(0.0);
         tySubscriber = table.getDoubleTopic("ty").subscribe(0.0);
-        megatag1Subscriber = table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
-        megatag2Subscriber =
-            table.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
-        }
+        hbSubscriber = table.getDoubleTopic("hb").subscribe(0.0);
+    }
 
     @Override
     public void updateInputs(VisionIOInputs inputs) {
         // Update connection status based on whether an update has been seen in the last 250ms
         inputs.connected = (RobotController.getFPGATime() - latencySubscriber.getLastChange()) < 250;
-
+        inputs.heartBeat = hbSubscriber.get();
         // Update target observation
         inputs.latestTargetObservation =
             new TargetObservation(
