@@ -38,9 +38,9 @@ public class ArmIOTalonFX implements ArmIO {
 
   public ArmIOTalonFX(int leadID, int followID, int gyroID) {
     TalonFXConfiguration config = new TalonFXConfiguration();
-    config.CurrentLimits.StatorCurrentLimit = SubsystemConstants.PivotConstants.CURRENT_LIMIT;
+    config.CurrentLimits.StatorCurrentLimit = SubsystemConstants.ArmConstants.CURRENT_LIMIT;
     config.CurrentLimits.StatorCurrentLimitEnable =
-        SubsystemConstants.PivotConstants.CURRENT_LIMIT_ENABLED;
+        SubsystemConstants.ArmConstants.CURRENT_LIMIT_ENABLED;
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
