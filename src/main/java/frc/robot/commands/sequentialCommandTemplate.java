@@ -16,12 +16,6 @@ public class sequentialCommandTemplate extends SequentialCommandGroup {
   public sequentialCommandTemplate(Flywheel flywheel, double velocity) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    addCommands(
-    flywheel.runVelocityCommand(velocity),
-    new WaitCommand(1),
-    flywheel.flywheelStop()
-
-
-    );
+    addCommands(flywheel.runVelocityCommand(velocity), new WaitCommand(1), flywheel.flywheelStop());
   }
 }

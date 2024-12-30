@@ -9,10 +9,11 @@ import frc.robot.subsystems.arms.Arm;
 
 public class setArmAngleTemplate extends Command {
   /** Creates a new setArmAngle. */
-
   private final Arm arm;
+
   private final double setpointDegs;
   private final double thresholdDegs;
+
   public setArmAngleTemplate(Arm arm, double setpointDegs, double thresholdDegs) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.arm = arm;
@@ -25,7 +26,7 @@ public class setArmAngleTemplate extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    arm.setPivotGoal(setpointDegs);
+    arm.setArmGoal(setpointDegs);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -39,6 +40,6 @@ public class setArmAngleTemplate extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Math.abs(arm.getPivotPositionDegs() - setpointDegs) <= thresholdDegs;
+    return Math.abs(arm.getArmPositionDegs() - setpointDegs) <= thresholdDegs;
   }
 }

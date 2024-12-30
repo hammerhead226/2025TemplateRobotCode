@@ -13,9 +13,6 @@ import frc.robot.constants.SubsystemConstants;
 
 /** Add your docs here. */
 public class ArmIOSim implements ArmIO {
-  // private final DCMotor pivotGearbox = DCMotor.getKrakenX60Foc(2);
-
-  // public RobotContainer robotContainer = new RobotContainer();
 
   // SIM VARIABLES (CHANGE)
   private int gearBoxMotorCount = 1;
@@ -27,10 +24,10 @@ public class ArmIOSim implements ArmIO {
   private boolean simulateGravity = true;
   private double startingAngleRads = 0.0;
 
-  private final DCMotor pivotGearbox = DCMotor.getFalcon500(gearBoxMotorCount);
+  private final DCMotor armGearbox = DCMotor.getFalcon500(gearBoxMotorCount);
   private final SingleJointedArmSim sim =
       new SingleJointedArmSim(
-          pivotGearbox,
+          armGearbox,
           gearing,
           momentOfInertia,
           armLength,

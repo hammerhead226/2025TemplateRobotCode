@@ -1,5 +1,7 @@
 package frc.robot.subsystems.arms;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
@@ -12,13 +14,13 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.SubsystemConstants;
 import frc.robot.util.Conversions;
-import org.littletonrobotics.junction.Logger;
 
 public class ArmIOTalonFX implements ArmIO {
   private final TalonFX leader;
@@ -98,9 +100,6 @@ public class ArmIOTalonFX implements ArmIO {
                 SubsystemConstants.ArmConstants.ARM_GEAR_RATIO)
             + SubsystemConstants.ArmConstants.ARM_ZERO_ANGLE;
 
-    // inputs.velocityDegsPerSec =
-    //     Conversions.falconToDegrees(
-    //         (followPositionDegs.getValueAsDouble()), Constants.PivotConstants.REDUCTION);
     inputs.velocityDegsPerSec = velocityDegsPerSec.getValueAsDouble();
     inputs.appliedVolts = appliedVolts.getValueAsDouble();
     inputs.currentAmps = currentAmps.getValueAsDouble();
@@ -126,7 +125,9 @@ public class ArmIOTalonFX implements ArmIO {
     leader.setControl(
         new PositionVoltage(
             Conversions.degreesToFalcon(
-                positionDegs, SubsystemConstants.ArmConstants.ARM_GEAR_RATIO))); // CHECK FOR STOW ANGLE (positionDegs - 59)
+                positionDegs,
+                SubsystemConstants.ArmConstants
+                    .ARM_GEAR_RATIO))); // CHECK FOR STOW ANGLE (positionDegs - 59)
   }
 
   @Override

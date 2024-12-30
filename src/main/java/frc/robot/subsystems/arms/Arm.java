@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
@@ -21,7 +20,7 @@ import frc.robot.constants.SubsystemConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class Arm extends SubsystemBase {
-  private final ArmIO pivot;
+  private final ArmIO arm;
   private final ArmIOInputsAutoLogged pInputs = new ArmIOInputsAutoLogged();
 
   private static double kP;
@@ -31,19 +30,19 @@ public class Arm extends SubsystemBase {
   private static double maxVelocityDegPerSec;
   private static double maxAccelerationDegPerSecSquared;
 
-  private TrapezoidProfile pivotProfile;
-  private TrapezoidProfile.Constraints pivotConstraints;
+  private TrapezoidProfile armProfile;
+  private TrapezoidProfile.Constraints armConstraints;
 
-  private TrapezoidProfile.State pivotGoalStateDegrees = new TrapezoidProfile.State();
-  private TrapezoidProfile.State pivotCurrentStateDegrees = new TrapezoidProfile.State();
+  private TrapezoidProfile.State armGoalStateDegrees = new TrapezoidProfile.State();
+  private TrapezoidProfile.State armCurrentStateDegrees = new TrapezoidProfile.State();
 
   double goalDegrees;
 
-  private ArmFeedforward pivotFFModel;
+  private ArmFeedforward armFFModel;
 
-  /** Creates a new Pivot. */
-  public Arm(ArmIO pivot) {
-    this.pivot = pivot;
+  /** Creates a new Arm. */
+  public Arm(ArmIO arm) {
+    this.arm = arm;
     switch (SimConstants.currentMode) {
       case REAL:
         kG = 0.29;
@@ -72,24 +71,24 @@ public class Arm extends SubsystemBase {
     maxAccelerationDegPerSecSquared = 1;
     // maxAccelerationDegPerSecSquared = 180;
 
-    pivotConstraints =
+    armConstraints =
         new TrapezoidProfile.Constraints(maxVelocityDegPerSec, maxAccelerationDegPerSecSquared);
-    pivotProfile = new TrapezoidProfile(pivotConstraints);
+    armProfile = new TrapezoidProfile(armConstraints);
 
-    // setPivotGoal(90);
-    // setPivotCurrent(getPivotPositionDegs());
-    pivotCurrentStateDegrees =
-        pivotProfile.calculate(0, pivotCurrentStateDegrees, pivotGoalStateDegrees);
+    // setArmGoal(90);
+    // setArmCurrent(getArmPositionDegs());
+    armCurrentStateDegrees =
+        armProfile.calculate(0, armCurrentStateDegrees, armGoalStateDegrees);
 
-    pivot.configurePID(kP, 0, 0);
-    pivotFFModel = new ArmFeedforward(0, kG, kV, 0);
+    arm.configurePID(kP, 0, 0);
+    armFFModel = new ArmFeedforward(0, kG, kV, 0);
   }
 
   public void setBrakeMode(boolean bool) {
-    pivot.setBrakeMode(bool);
+    arm.setBrakeMode(bool);
   }
 
-  public double getPivotPositionDegs() {
+  public double getArmPositionDegs() {
     return pInputs.positionDegs;
   }
 
@@ -97,55 +96,55 @@ public class Arm extends SubsystemBase {
     return (Math.abs(pInputs.positionDegs - goalDegrees) <= threshold);
   }
 
-  private double getPivotError() {
+  private double getArmError() {
     return pInputs.positionSetpointDegs - pInputs.positionDegs;
   }
 
   public void setPositionDegs(double positionDegs, double velocityDegsPerSec) {
-    positionDegs = MathUtil.clamp(positionDegs, 33, 120);
-    pivot.setPositionSetpointDegs(
+    // positionDegs = MathUtil.clamp(positionDegs, 33, 120);
+    arm.setPositionSetpointDegs(
         positionDegs,
-        pivotFFModel
+        armFFModel
             .calculate(
                 Angle.ofBaseUnits(positionDegs, Degrees),
                 AngularVelocity.ofBaseUnits(velocityDegsPerSec, DegreesPerSecond))
             .in(Volts));
   }
 
-  public void pivotStop() {
-    pivot.stop();
+  public void armStop() {
+    arm.stop();
   }
 
-  public void setPivotGoal(double goalDegrees) {
+  public void setArmGoal(double goalDegrees) {
     this.goalDegrees = goalDegrees;
-    pivotGoalStateDegrees = new TrapezoidProfile.State(goalDegrees, 0);
+    armGoalStateDegrees = new TrapezoidProfile.State(goalDegrees, 0);
   }
 
-  public void setPivotCurrent(double currentDegrees) {
-    pivotCurrentStateDegrees = new TrapezoidProfile.State(currentDegrees, 0);
+  public void setArmCurrent(double currentDegrees) {
+    armCurrentStateDegrees = new TrapezoidProfile.State(currentDegrees, 0);
   }
 
-  public Command setPivotTarget(double goal, double threshold) {
+  public Command setArmTarget(double goalDegrees, double thresholdDegrees) {
 
-    return new InstantCommand(() -> setPivotGoal(goal), this).until(() -> atGoal(threshold));
+    return new InstantCommand(() -> setArmGoal(goalDegrees), this).until(() -> atGoal(thresholdDegrees));
   }
 
   @Override
   public void periodic() {
-    pivot.updateInputs(pInputs);
+    arm.updateInputs(pInputs);
 
-    pivotCurrentStateDegrees =
-        pivotProfile.calculate(
+    armCurrentStateDegrees =
+        armProfile.calculate(
             SubsystemConstants.LOOP_PERIOD_SECONDS,
-            pivotCurrentStateDegrees,
-            pivotGoalStateDegrees);
+            armCurrentStateDegrees,
+            armGoalStateDegrees);
 
-    setPositionDegs(pivotCurrentStateDegrees.position, pivotCurrentStateDegrees.velocity);
+    setPositionDegs(armCurrentStateDegrees.position, armCurrentStateDegrees.velocity);
 
-    Logger.processInputs("Pivot", pInputs);
-    Logger.recordOutput("pivot error", getPivotError());
+    Logger.processInputs("Arm", pInputs);
+    Logger.recordOutput("arm error", getArmError());
 
-    Logger.recordOutput("pivot goal", goalDegrees);
+    Logger.recordOutput("arm goal", goalDegrees);
     // This method will be called once per scheduler run
   }
 }
