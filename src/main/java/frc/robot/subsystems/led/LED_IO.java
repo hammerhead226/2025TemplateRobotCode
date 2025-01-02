@@ -4,7 +4,7 @@
 
 package frc.robot.subsystems.led;
 
-import frc.robot.Constants.LED_STATE;
+import frc.robot.constants.SubsystemConstants.LED_STATE;
 import org.littletonrobotics.junction.AutoLog;
 
 /** Add your docs here. */

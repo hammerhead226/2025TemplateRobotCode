@@ -13,8 +13,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.constants.SimConstants;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -32,12 +34,7 @@ public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
 
-  /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
-   */
-  @Override
-  public void robotInit() {
+  public Robot() {
     // Record metadata
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
     Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -57,7 +54,7 @@ public class Robot extends LoggedRobot {
     }
 
     // Set up data receivers & replay source
-    switch (Constants.currentMode) {
+    switch (SimConstants.currentMode) {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
         Logger.addDataReceiver(new WPILOGWriter());
@@ -78,9 +75,6 @@ public class Robot extends LoggedRobot {
         break;
     }
 
-    // See http://bit.ly/3YIzFZ6 for more information on timestamps in AdvantageKit.
-    // Logger.disableDeterministicTimestamps()
-
     // Start AdvantageKit logger
     Logger.start();
 
@@ -92,12 +86,18 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
+    // Switch thread to high priority to improve loop timing
+    Threads.setCurrentThreadPriority(true, 99);
+
     // Runs the Scheduler. This is responsible for polling buttons, adding
     // newly-scheduled commands, running already-scheduled commands, removing
     // finished or interrupted commands, and running subsystem periodic() methods.
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
     CommandScheduler.getInstance().run();
+
+    // Return to normal thread priority
+    Threads.setCurrentThreadPriority(false, 10);
   }
 
   /** This function is called once when the robot is disabled. */

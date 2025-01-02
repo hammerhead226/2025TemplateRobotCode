@@ -1,199 +1,124 @@
 package frc.robot.subsystems.elevator;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
+import static edu.wpi.first.units.Units.InchesPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.util.LoggedTunableNumber;
+import frc.robot.constants.SimConstants;
+import frc.robot.constants.SubsystemConstants;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class Elevator extends SubsystemBase {
 
   private final ElevatorIO elevator;
-  private final AmpBarIO ampBar;
 
   private final ElevatorIOInputsAutoLogged eInputs = new ElevatorIOInputsAutoLogged();
-  private final AmpBarIOInputsAutoLogged aInputs = new AmpBarIOInputsAutoLogged();
 
-  private static final LoggedTunableNumber kP = new LoggedTunableNumber("Elevator/kP");
-  private static final LoggedTunableNumber kI = new LoggedTunableNumber("Elevator/kI");
+  private static final LoggedNetworkNumber kP = new LoggedNetworkNumber("Elevator/kP");
+  private static final LoggedNetworkNumber kI = new LoggedNetworkNumber("Elevator/kI");
 
-  private static final LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS");
-  private static final LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG");
-  private static final LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV");
-  private static final LoggedTunableNumber kA = new LoggedTunableNumber("Elevator/kA");
+  private static final LoggedNetworkNumber kS = new LoggedNetworkNumber("Elevator/kS");
+  private static final LoggedNetworkNumber kG = new LoggedNetworkNumber("Elevator/kG");
+  private static final LoggedNetworkNumber kV = new LoggedNetworkNumber("Elevator/kV");
+  private static final LoggedNetworkNumber kA = new LoggedNetworkNumber("Elevator/kA");
 
-  // amp bar gains
+  private static final LoggedNetworkNumber barkG = new LoggedNetworkNumber("Bar/kG");
 
-  private static final LoggedTunableNumber barkP = new LoggedTunableNumber("Bar/kP");
-  private static final LoggedTunableNumber barkV = new LoggedTunableNumber("Bar/kV");
-  private static final LoggedTunableNumber barkG = new LoggedTunableNumber("Bar/kG");
+  // CHANGE THESE VALUES TO MATCH THE ELEVATOR
+  private static final int maxVelocityExtender = 1;
+  private static final int maxAccelerationExtender = 1;
 
   private TrapezoidProfile extenderProfile;
   private TrapezoidProfile.Constraints extenderConstraints =
-      new TrapezoidProfile.Constraints(30, 85);
+      new TrapezoidProfile.Constraints(maxVelocityExtender, maxAccelerationExtender);
   private TrapezoidProfile.State extenderGoal = new TrapezoidProfile.State();
   private TrapezoidProfile.State extenderCurrent = new TrapezoidProfile.State();
 
-  private static double maxVelocityDegPerSec;
-  private static double maxAccelerationDegPerSecSquared;
-
-  private TrapezoidProfile barProfile;
-  private TrapezoidProfile.Constraints barConstraints;
-
-  private TrapezoidProfile.State barGoal = new TrapezoidProfile.State();
-  private TrapezoidProfile.State barCurrent = new TrapezoidProfile.State();
-
   private double goal;
-  // private double barGoalPos;
   private final ElevatorFeedforward elevatorFFModel;
-  private final ArmFeedforward barFFmodel;
 
-  public Elevator(ElevatorIO elevator, AmpBarIO ampBar) {
+  public Elevator(ElevatorIO elevator) {
     this.elevator = elevator;
-    this.ampBar = ampBar;
 
-    switch (Constants.getMode()) {
+    switch (SimConstants.currentMode) {
       case REAL:
-        kS.initDefault(0);
-        kG.initDefault(0.25);
-        kV.initDefault(0);
-        kA.initDefault(0);
+        kS.setDefault(0);
+        kG.setDefault(0);
+        kV.setDefault(0);
+        kA.setDefault(0);
 
-        kP.initDefault(0.44);
-        kI.initDefault(0);
+        kP.setDefault(0);
+        kI.setDefault(0);
 
-        barkP.initDefault(0.25);
-        barkV.initDefault(0.2);
-        barkG.initDefault(0);
+        barkG.setDefault(0);
         break;
       case REPLAY:
-        kS.initDefault(0);
-        kG.initDefault(0.13);
-        kV.initDefault(0);
-        kA.initDefault(0);
+        kS.setDefault(0);
+        kG.setDefault(0);
+        kV.setDefault(0);
+        kA.setDefault(0);
 
-        kP.initDefault(15);
-        kI.initDefault(0);
+        kP.setDefault(0);
+        kI.setDefault(0);
 
-        barkP.initDefault(0);
-        barkV.initDefault(0);
-        barkG.initDefault(0);
+        barkG.setDefault(0);
         break;
       case SIM:
-        kS.initDefault(0);
-        kG.initDefault(0.04);
-        kV.initDefault(0);
-        kA.initDefault(0);
+        kS.setDefault(0);
+        kG.setDefault(0);
+        kV.setDefault(0);
+        kA.setDefault(0);
 
-        kP.initDefault(1);
-        kI.initDefault(0);
+        kP.setDefault(1);
+        kI.setDefault(0);
 
-        barkP.initDefault(0);
-        barkV.initDefault(0);
-        barkG.initDefault(0);
+        barkG.setDefault(0);
         break;
       default:
-        kS.initDefault(0);
-        kG.initDefault(0.13);
-        kV.initDefault(0);
-        kA.initDefault(0);
+        kS.setDefault(0);
+        kG.setDefault(0);
+        kV.setDefault(0);
+        kA.setDefault(0);
 
-        kP.initDefault(15);
-        kI.initDefault(0);
+        kP.setDefault(0);
+        kI.setDefault(0);
 
-        barkP.initDefault(0);
-        barkV.initDefault(0);
-        barkG.initDefault(0);
+        barkG.setDefault(0);
         break;
     }
 
-    setExtenderGoal(0.162);
+    // CHANGE THIS VALUE TO MATCH THE ELEVATOR
+    setExtenderGoal(1);
     extenderProfile = new TrapezoidProfile(extenderConstraints);
     extenderCurrent = extenderProfile.calculate(0, extenderCurrent, extenderGoal);
 
-    maxVelocityDegPerSec = 1200;
-    maxAccelerationDegPerSecSquared = 1550;
-
-    barConstraints =
-        new TrapezoidProfile.Constraints(maxVelocityDegPerSec, maxAccelerationDegPerSecSquared);
-    barProfile = new TrapezoidProfile(barConstraints);
-    barCurrent = barProfile.calculate(0, barCurrent, barGoal);
-
     this.elevator.configurePID(kP.get(), 0, 0);
     elevatorFFModel = new ElevatorFeedforward(kS.get(), kG.get(), kV.get(), kA.get());
-
-    this.ampBar.configurePID(barkP.get(), 0, 0);
-    barFFmodel = new ArmFeedforward(0, barkG.get(), barkV.get(), 0);
   }
 
   public boolean atGoal() {
-    return (Math.abs(eInputs.elevatorPosition - goal) <= Constants.ElevatorConstants.THRESHOLD);
-  }
-
-  public boolean barAtGoal() {
-    return (Math.abs(aInputs.barPositionDegrees - barGoal.position)
-        <= Constants.ElevatorConstants.BAR_THRESHOLD);
+    return (Math.abs(eInputs.elevatorPositionInch - goal)
+        <= SubsystemConstants.ElevatorConstants.THRESHOLD);
   }
 
   public double getElevatorPosition() {
-    return eInputs.elevatorPosition;
+    return eInputs.elevatorPositionInch;
   }
 
   private double getElevatorError() {
-    return eInputs.positionSetpoint - eInputs.elevatorPosition;
+    return eInputs.positionSetpointInch - eInputs.elevatorPositionInch;
   }
 
-  private double getBarError() {
-
-    return aInputs.barPositionSetpointDegrees - aInputs.barPositionDegrees;
+  public boolean elevatorAtSetpoint(double thersholdInches) {
+    return (Math.abs(getElevatorError()) <= thersholdInches);
   }
-
-  private double getbarErrorToGoal() {
-    return barGoal.position - aInputs.barPositionDegrees;
-  }
-
-  public boolean elevatorAtSetpoint() {
-    return (Math.abs(getElevatorError()) <= Constants.ElevatorConstants.THRESHOLD);
-  }
-
-  public boolean ampBarAtGoal() {
-
-    return (Math.abs(getbarErrorToGoal()) <= Constants.ElevatorConstants.BAR_THRESHOLD);
-  }
-
-  public void setBarBrakeMode(boolean bool) {
-    ampBar.setBrakeMode(bool);
-  }
-
-  public double getBarPositionRotations() {
-    return aInputs.barPositionDegrees;
-  }
-
-  public void setBarPosition(double positionDegrees, double velocityDegsPerSec) {
-
-    // positionRotations = MathUtil.clamp(positionRotations, 0, 20);
-    Logger.recordOutput("bar PositionDegrees", positionDegrees);
-    ampBar.setPositionSetpoint(positionDegrees, 0);
-    // barFFmodel.calculate(Math.toRadians(positionDegrees), Math.toRadians(velocityDegsPerSec))
-  }
-
-  public void stopAmpBar() {
-    ampBar.stop();
-  }
-
-  public void setBarGoal(double barGoalDegrees) {
-
-    barGoal = new TrapezoidProfile.State(barGoalDegrees, 0);
-    Logger.recordOutput("bar goal", barGoalDegrees);
-  }
-
-  // public void setbarCurrent(double current) {
-
-  //   barCurrent = new TrapezoidProfile.State(current, 0);
-  // }
 
   public void setExtenderGoal(double setpoint) {
     goal = setpoint;
@@ -201,7 +126,9 @@ public class Elevator extends SubsystemBase {
   }
 
   public void setPositionExtend(double position, double velocity) {
-    elevator.setPositionSetpoint(position, elevatorFFModel.calculate(velocity));
+    elevator.setPositionSetpoint(
+        position,
+        elevatorFFModel.calculate(LinearVelocity.ofBaseUnits(velocity, InchesPerSecond)).in(Volts));
   }
 
   public void elevatorStop() {
@@ -222,7 +149,13 @@ public class Elevator extends SubsystemBase {
   }
 
   public boolean isExtended() {
-    return extenderGoal.position == Constants.ElevatorConstants.EXTEND_SETPOINT_INCH;
+    return extenderGoal.position == SubsystemConstants.ElevatorConstants.EXTEND_SETPOINT_INCH;
+  }
+
+  public Command setElevatorTarget(double goalInches, double thersholdInches) {
+
+    return new InstantCommand(() -> setExtenderGoal(goalInches), this)
+        .until(() -> elevatorAtSetpoint(thersholdInches));
   }
 
   @Override
@@ -230,31 +163,13 @@ public class Elevator extends SubsystemBase {
     Logger.recordOutput("Alliance", DriverStation.getAlliance().isPresent());
 
     elevator.updateInputs(eInputs);
-    ampBar.updateInputs(aInputs);
 
     extenderCurrent =
-        extenderProfile.calculate(Constants.LOOP_PERIOD_SECS, extenderCurrent, extenderGoal);
-
-    barCurrent = barProfile.calculate(Constants.LOOP_PERIOD_SECS, barCurrent, barGoal);
+        extenderProfile.calculate(
+            SubsystemConstants.LOOP_PERIOD_SECONDS, extenderCurrent, extenderGoal);
 
     setPositionExtend(extenderCurrent.position, extenderCurrent.velocity);
 
-    setBarPosition(barCurrent.position, barCurrent.velocity);
-
     Logger.processInputs("Elevator", eInputs);
-    Logger.processInputs("Amp bar inputs", aInputs);
-
-    Logger.recordOutput("amp bar error", getBarError());
-    Logger.recordOutput("amp bar goal", barGoal.position);
-
-    Logger.recordOutput("amp bar currentPos", barCurrent.position);
-    if (kP.hasChanged(hashCode()) || kI.hasChanged(hashCode())) {
-      elevator.configurePID(kP.get(), kI.get(), 0);
-    }
-    if (barkP.hasChanged(hashCode())
-        || barkV.hasChanged(hashCode())
-        || barkG.hasChanged(hashCode())) {
-      ampBar.configurePID(barkP.get(), 0, 0);
-    }
   }
 }

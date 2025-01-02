@@ -16,25 +16,43 @@ package frc.robot.subsystems.flywheel;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import frc.robot.constants.SubsystemConstants;
 
 public class FlywheelIOSim implements FlywheelIO {
-  private FlywheelSim sim = new FlywheelSim(DCMotor.getNEO(1), 1.5, 0.004);
+  // CHANGE THESE VALUES TO MATCH YOUR MOTOR AND GEARBOX
+  private int gearBoxMotorCount = 1;
+  private double gearing = 1;
+  private double momentOfInertia = 1;
+  private DCMotor motor = DCMotor.getKrakenX60Foc(gearBoxMotorCount);
+  private double[] stds = {1, 2, 3};
+
+  private DCMotorSim sim =
+      new DCMotorSim(
+          LinearSystemId.createDCMotorSystem(motor, gearBoxMotorCount, gearing), motor, 0.0);
+
   private PIDController pid = new PIDController(0.0, 0.0, 0.0);
 
   private boolean closedLoop = false;
   private double ffVolts = 0.0;
   private double appliedVolts = 0.0;
 
+  private double clampedValueLowVolts = -12.0;
+  private double clampedValueHighVolts = 12.0;
+
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
     if (closedLoop) {
       appliedVolts =
-          MathUtil.clamp(pid.calculate(sim.getAngularVelocityRadPerSec()) + ffVolts, -12.0, 12.0);
+          MathUtil.clamp(
+              pid.calculate(sim.getAngularVelocityRadPerSec()) + ffVolts,
+              clampedValueLowVolts,
+              clampedValueHighVolts);
       sim.setInputVoltage(appliedVolts);
     }
 
-    sim.update(0.02);
+    sim.update(SubsystemConstants.LOOP_PERIOD_SECONDS);
 
     inputs.positionRad = 0.0;
     inputs.velocityRadPerSec = sim.getAngularVelocityRadPerSec();

@@ -2,28 +2,39 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.pivot;
+package frc.robot.subsystems.arms;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import frc.robot.Constants;
+import frc.robot.constants.SubsystemConstants;
 
 /** Add your docs here. */
-public class PivotIOSim implements PivotIO {
-  private final DCMotor pivotGearbox = DCMotor.getFalcon500(2);
+public class ArmIOSim implements ArmIO {
+
+  // SIM VARIABLES (CHANGE)
+  private int gearBoxMotorCount = 1;
+  private double gearing = 1;
+  private double armLength = Units.inchesToMeters(1); // CHANGE PER ARM
+  private double momentOfInertia = SingleJointedArmSim.estimateMOI(armLength, 1); // CHANGE PER ARM
+  private double minAngleRadians = 0;
+  private double maxAngleRadians = Math.PI;
+  private boolean simulateGravity = true;
+  private double startingAngleRads = 0.0;
+
+  private final DCMotor armGearbox = DCMotor.getFalcon500(gearBoxMotorCount);
   private final SingleJointedArmSim sim =
       new SingleJointedArmSim(
-          pivotGearbox,
-          5,
-          SingleJointedArmSim.estimateMOI(Units.inchesToMeters(20), 0.1),
-          Units.inchesToMeters(20),
-          0,
-          Math.PI,
-          true,
-          0);
+          armGearbox,
+          gearing,
+          momentOfInertia,
+          armLength,
+          minAngleRadians,
+          maxAngleRadians,
+          simulateGravity,
+          startingAngleRads);
   private final PIDController pid = new PIDController(0, 0, 0);
 
   private double currentAmps = 0.0;
@@ -32,12 +43,18 @@ public class PivotIOSim implements PivotIO {
   private double positionRads = 0.0;
   private double positionSetpointRads = 0.0;
 
+  private double clampedValueLowVolts = -12.0;
+  private double clampedValueHighVolts = 12.0;
+
   @Override
-  public void updateInputs(PivotIOInputs inputs) {
+  public void updateInputs(ArmIOInputs inputs) {
     positionSetpointRads = pid.getSetpoint();
 
     appliedVolts +=
-        MathUtil.clamp(pid.calculate(sim.getAngleRads(), positionSetpointRads), -12.0, 12);
+        MathUtil.clamp(
+            pid.calculate(sim.getAngleRads(), positionSetpointRads),
+            clampedValueLowVolts,
+            clampedValueHighVolts);
 
     sim.setInputVoltage(appliedVolts);
 
@@ -51,7 +68,7 @@ public class PivotIOSim implements PivotIO {
     inputs.velocityDegsPerSec = Math.toDegrees(velocityRadsPerSec);
     inputs.currentAmps = currentAmps;
 
-    sim.update(Constants.LOOP_PERIOD_SECS);
+    sim.update(SubsystemConstants.LOOP_PERIOD_SECONDS);
   }
 
   @Override
