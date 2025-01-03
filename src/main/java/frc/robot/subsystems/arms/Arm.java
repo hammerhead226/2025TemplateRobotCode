@@ -77,8 +77,7 @@ public class Arm extends SubsystemBase {
 
     // setArmGoal(90);
     // setArmCurrent(getArmPositionDegs());
-    armCurrentStateDegrees =
-        armProfile.calculate(0, armCurrentStateDegrees, armGoalStateDegrees);
+    armCurrentStateDegrees = armProfile.calculate(0, armCurrentStateDegrees, armGoalStateDegrees);
 
     arm.configurePID(kP, 0, 0);
     armFFModel = new ArmFeedforward(0, kG, kV, 0);
@@ -126,7 +125,8 @@ public class Arm extends SubsystemBase {
 
   public Command setArmTarget(double goalDegrees, double thresholdDegrees) {
 
-    return new InstantCommand(() -> setArmGoal(goalDegrees), this).until(() -> atGoal(thresholdDegrees));
+    return new InstantCommand(() -> setArmGoal(goalDegrees), this)
+        .until(() -> atGoal(thresholdDegrees));
   }
 
   @Override
@@ -135,9 +135,7 @@ public class Arm extends SubsystemBase {
 
     armCurrentStateDegrees =
         armProfile.calculate(
-            SubsystemConstants.LOOP_PERIOD_SECONDS,
-            armCurrentStateDegrees,
-            armGoalStateDegrees);
+            SubsystemConstants.LOOP_PERIOD_SECONDS, armCurrentStateDegrees, armGoalStateDegrees);
 
     setPositionDegs(armCurrentStateDegrees.position, armCurrentStateDegrees.velocity);
 

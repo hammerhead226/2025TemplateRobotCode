@@ -32,6 +32,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -50,6 +51,7 @@ import frc.robot.constants.SimConstants;
 import frc.robot.constants.SimConstants.Mode;
 import frc.robot.constants.SubsystemConstants;
 import frc.robot.constants.TunerConstants;
+import frc.robot.subsystems.vision.ObjectDetection;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -71,6 +73,7 @@ public class Drive extends SubsystemBase {
 
   // PathPlanner config constants
   // CHANGE THESE WHEN SEASON STARTS
+  private static final double OBJECT_BUFFER_SIZE_SECONDS = 1.0;
   private static final double ROBOT_MASS_KG = 1;
   private static final double ROBOT_MOI = 1;
   private static final double WHEEL_COF = 1;
@@ -98,6 +101,10 @@ public class Drive extends SubsystemBase {
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private Rotation2d rawGyroRotation = new Rotation2d();
+
+  private final TimeInterpolatableBuffer<Pose2d> gamePieceBuffer =
+      TimeInterpolatableBuffer.createBuffer(OBJECT_BUFFER_SIZE_SECONDS);
+
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] {
         new SwerveModulePosition(),
@@ -158,6 +165,10 @@ public class Drive extends SubsystemBase {
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+  }
+
+  public Pose2d getPoseAtTimeStamp(double seconds) {
+    return poseEstimator.sampleAt(seconds).orElse(new Pose2d());
   }
 
   @Override
@@ -338,6 +349,10 @@ public class Drive extends SubsystemBase {
   public void setPose(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
   }
+  // public double getTimeStamp(){
+
+  //  return poseEstimator.
+  // }
 
   /** Adds a new timestamped vision measurement. */
   public void addVisionMeasurement(
@@ -346,6 +361,16 @@ public class Drive extends SubsystemBase {
       Matrix<N3, N1> visionMeasurementStdDevs) {
     poseEstimator.addVisionMeasurement(
         visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+  }
+
+  public void addObjectMeasurement(
+      Translation2d objectRobotRelativePoseMeters, double timeStampSeconds) {
+    Pose2d robotPoseAtTimeStamp = poseEstimator.sampleAt(timeStampSeconds).orElse(new Pose2d());
+
+    gamePieceBuffer.addSample(
+        timeStampSeconds,
+        ObjectDetection.calculateNotePositionFieldRelative(
+            robotPoseAtTimeStamp, objectRobotRelativePoseMeters));
   }
 
   /** Returns the maximum linear speed in meters per sec. */

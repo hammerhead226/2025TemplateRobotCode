@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.constants.SimConstants;
 import frc.robot.constants.TunerConstants;
+import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -39,9 +40,14 @@ import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.flywheel.FlywheelIO;
 import frc.robot.subsystems.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.flywheel.FlywheelIOTalonFX;
+import frc.robot.subsystems.vision.ObjectDetection;
+import frc.robot.subsystems.vision.ObjectDetectionIO;
+import frc.robot.subsystems.vision.ObjectDetectionIOLimelight;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -55,7 +61,7 @@ public class RobotContainer {
   public static Drive drive;
   private final Flywheel flywheel;
   private final Vision vision;
-
+  private final ObjectDetection object;
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
 
@@ -81,6 +87,10 @@ public class RobotContainer {
                 drive::addVisionMeasurement,
                 new VisionIOLimelight(camera0Name, drive::getRotation),
                 new VisionIOLimelight(camera1Name, drive::getRotation));
+        object =
+            new ObjectDetection(
+                drive::addObjectMeasurement,
+                new ObjectDetectionIOLimelight(VisionConstants.cameraObjectDetect));
 
         // drive = new Drive(
         // new GyroIOPigeon2(true),
@@ -100,8 +110,8 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
-        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
-
+        vision = new Vision(drive::addVisionMeasurement, new VisionIOPhotonVisionSim(camera0Name, VisionConstants.robotToCamera0, drive::getPose), new VisionIOPhotonVisionSim(camera1Name, VisionConstants.robotToCamera1, drive::getPose));
+        object = new ObjectDetection(drive::addObjectMeasurement, new ObjectDetectionIO() {});
         flywheel = new Flywheel(new FlywheelIOSim());
 
         break;
@@ -117,6 +127,7 @@ public class RobotContainer {
                 new ModuleIO() {});
         flywheel = new Flywheel(new FlywheelIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        object = new ObjectDetection(drive::addObjectMeasurement, new ObjectDetectionIO() {});
         break;
     }
 

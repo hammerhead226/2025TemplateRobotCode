@@ -86,6 +86,7 @@ public class VisionIOLimelight implements VisionIO {
       for (int i = 10; i < rawSample.value.length; i += 7) {
         tagIds.add((int) rawSample.value[i]);
       }
+      inputs.poseTimeStamp = rawSample.timestamp * 1.0e-9 - rawSample.value[7] * 1.0e-3;
       poseObservations.add(
           new PoseObservation(
               // Timestamp, based on server timestamp of publish and latency
